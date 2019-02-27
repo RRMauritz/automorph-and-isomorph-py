@@ -25,22 +25,22 @@ def color_refinement(G: "Graph"):
             # Check if colors were the same previously
             if colors_old[u] == colors_old[v]:
                 # Get the colors of the neighbourhood
-                u_neighbours = Counter([colors_old[k] for k in u.neighbours])
-                v_neighbours = Counter([colors_old[k] for k in v.neighbours])
+                u_color_neighbourhood = Counter([colors_old[k] for k in u.neighbours])
+                v_color_neighbourhood = Counter([colors_old[k] for k in v.neighbours])
 
-                if u_neighbours == v_neighbours:
+                if u_color_neighbourhood == v_color_neighbourhood:
                     # If the neighbourhood color is not defined, add it to the dict
-                    if frozenset(u_neighbours.items()) not in c_map.keys():
-                        c_map[frozenset(u_neighbours.items())] = colors_old[u]
+                    if frozenset(u_color_neighbourhood.items()) not in c_map.keys():
+                        c_map[frozenset(u_color_neighbourhood.items())] = colors_old[u]
 
                     # Assign colors to vertices
-                    colors[u] = c_map[frozenset(u_neighbours.items())]
-                    colors[v] = c_map[frozenset(v_neighbours.items())]
+                    colors[u] = c_map[frozenset(u_color_neighbourhood.items())]
+                    colors[v] = c_map[frozenset(v_color_neighbourhood.items())]
                 else:
                     # If the two nodes don't share the same neighbourhood
                     # Make a new color for one of them
                     last_color += 1
-                    c_map[frozenset(v_neighbours.items())] = last_color
+                    c_map[frozenset(v_color_neighbourhood.items())] = last_color
 
     # Make labels the color number and graph colorful
     for v in G.vertices:
@@ -50,7 +50,7 @@ def color_refinement(G: "Graph"):
     return colors
 
 
-# Determine whether two graphs are isomophic by comparing their partitions
+# Determine whether two graphs are isomorphic by comparing their partitions
 def is_isomorph(G, B):
     # Make sorted list of the number of occurences of each color
     g_part = sorted(Counter(color_refinement(G).values()).values())
@@ -60,15 +60,18 @@ def is_isomorph(G, B):
 
 
 # Load graph
-with open('./colorref_smallexample_4_16.grl') as f:
-    G = load_graph(f)
+with open('examplegraph.gr') as f:
+    G1 = load_graph(f)
+
+with open('examplegraph2.gr') as f:
+    G2 = load_graph(f)
 
 # Apply function
-color_refinement(G)
+color_refinement(G1)
 
 # Write the dot file
 with open('colored.dot', 'w') as f:
-    write_dot(G, f)
+    write_dot(G1, f)
 
 # Test for isomorphism
-print(is_isomorph(G, G))
+print(is_isomorph(G1, G2))
