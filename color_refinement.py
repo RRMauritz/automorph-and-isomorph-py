@@ -18,7 +18,7 @@ def color_refinement(G: "Graph"):
 
         # Create coloring of vertices
         # Iterate over all vertices
-        for u, v in product(G.vertices, G.vertices):
+        for u, v in product(reversed(G.vertices), G.vertices):
             # Check if colors were the same previously
             if colors_old[u] == colors_old[v]:
                 # Get the colors of the neighbourhood
@@ -57,3 +57,8 @@ K = color_refinement(G)
 # Write the dot file
 with open('colored.dot', 'w') as f:
     write_dot(K, f)
+
+# To find out whether a graph is a isomorphic
+# Compare total number of partitions
+# Compare size of each partition if there is an equivalent
+# If these conditions hold the graphs are isomorphic of each other
