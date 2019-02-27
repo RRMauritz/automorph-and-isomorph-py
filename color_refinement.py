@@ -21,6 +21,7 @@ def color_refinement(G: "Graph"):
         for u, v in product(G.vertices, G.vertices):
             # Check if colors were the same previously
             if colors_old[u] == colors_old[v]:
+                # Get the colors of the neighbourhood
                 u_neighbours = Counter([colors_old[k] for k in u.neighbours])
                 v_neighbours = Counter([colors_old[k] for k in v.neighbours])
 
@@ -29,6 +30,7 @@ def color_refinement(G: "Graph"):
                     if frozenset(u_neighbours.items()) not in c_map.keys():
                         c_map[frozenset(u_neighbours.items())] = colors_old[u]
 
+                    # Assign colors
                     colors[u] = c_map[frozenset(u_neighbours.items())]
                     colors[v] = c_map[frozenset(v_neighbours.items())]
                 else:
@@ -37,20 +39,21 @@ def color_refinement(G: "Graph"):
                     last_color += 1
                     c_map[frozenset(v_neighbours.items())] = last_color
 
+    # Make labels the color number and make graph colorful
     for v in G.vertices:
         v.label = colors[v]
         v.colornum = v.label
 
-    for k, v in Counter([v.label for v in G.vertices]).items():
-        if v > 1:
-            print(k)
     return G
 
 
-with open('./colorref_smallexample_4_7.grl') as f:
+# Load graph
+with open('./colorref_smallexample_4_16.grl') as f:
     G = load_graph(f)
 
+# Apply function
 K = color_refinement(G)
 
+# Write the dot file
 with open('colored.dot', 'w') as f:
     write_dot(K, f)
