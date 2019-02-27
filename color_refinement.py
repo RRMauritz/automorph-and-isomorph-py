@@ -6,10 +6,13 @@ from itertools import product
 
 def color_refinement(G: "Graph"):
     # Initialize colors for every vertex
-    #colors = {v: 0 for v in G.vertices}
+    #colors = {v: 0 for v in G.vertices} # Optional for initializing everything to 0
     colors = {v: v.degree for v in G.vertices}
+    # Find the highest color value
     last_color = max([c for k, c in colors.items()])
+    # Stores version of color configuration from previous loop iteration
     colors_old = {}
+    # Keeps track of colors used for certain neighbourhoods
     c_map = {}
 
     while not colors == colors_old:
@@ -30,7 +33,7 @@ def color_refinement(G: "Graph"):
                     if frozenset(u_neighbours.items()) not in c_map.keys():
                         c_map[frozenset(u_neighbours.items())] = colors_old[u]
 
-                    # Assign colors
+                    # Assign colors to vertices
                     colors[u] = c_map[frozenset(u_neighbours.items())]
                     colors[v] = c_map[frozenset(v_neighbours.items())]
                 else:
@@ -39,12 +42,21 @@ def color_refinement(G: "Graph"):
                     last_color += 1
                     c_map[frozenset(v_neighbours.items())] = last_color
 
-    # Make labels the color number and make graph colorful
+    # Make labels the color number and graph colorful
     for v in G.vertices:
         v.label = colors[v]
         v.colornum = v.label
 
-    return G
+    return colors
+
+
+# Determine whether two graphs are isomophic by comparing their partitions
+def is_isomorph(G, B):
+    # Make sorted list of the number of occurences of each color
+    g_part = sorted(Counter(color_refinement(G).values()).values())
+    b_part = sorted(Counter(color_refinement(B).values()).values())
+    # Compare them by length and content
+    return g_part == b_part
 
 
 # Load graph
@@ -52,13 +64,11 @@ with open('./colorref_smallexample_4_16.grl') as f:
     G = load_graph(f)
 
 # Apply function
-K = color_refinement(G)
+color_refinement(G)
 
 # Write the dot file
 with open('colored.dot', 'w') as f:
-    write_dot(K, f)
+    write_dot(G, f)
 
-# To find out whether a graph is a isomorphic
-# Compare total number of partitions
-# Compare size of each partition if there is an equivalent
-# If these conditions hold the graphs are isomorphic of each other
+# Test for isomorphism
+print(is_isomorph(G, G))
