@@ -21,7 +21,7 @@ def color_refinement(G: "Graph"):
 
         # Create coloring of vertices
         # Iterate over all vertices
-        for u, v in product(reversed(G.vertices), G.vertices):
+        for u, v in product(G.vertices, G.vertices):
             # Check if colors were the same previously
             if colors_old[u] == colors_old[v]:
                 # Get the colors of the neighbourhood
