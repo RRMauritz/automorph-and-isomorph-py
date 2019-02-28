@@ -61,14 +61,17 @@ def is_isomorph(G, B):
 
 # Load graph
 with open('./colorref_smallexample_4_16.grl') as f:
-    G = load_graph(f)
+    G = load_graph(f, read_list = True)
 
 # Apply function
-color_refinement(G)
+color_refinement(G[0][0])
+color_refinement(G[0][1])
 
 # Write the dot file
-with open('colored.dot', 'w') as f:
-    write_dot(G, f)
+with open('colored0.dot', 'w') as f:
+    write_dot(G[0][0], f)
+with open('colored1.dot', 'w') as f:
+    write_dot(G[0][1], f)
 
 # Test for isomorphism
-print(is_isomorph(G, G))
+print(is_isomorph(G[0][0], G[0][1]))
