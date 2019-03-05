@@ -29,13 +29,13 @@ def color_refinement(G: "Graph"):
                 v_color_neighbourhood = Counter([colors_old[k] for k in v.neighbours])
 
                 if u_color_neighbourhood == v_color_neighbourhood:
-                    # If the neighbourhood color is not defined, add it to the dict
+                    # If the neighbourhood color configuration is not defined, add it to the dict
                     if frozenset(u_color_neighbourhood.items()) not in c_map.keys():
                         c_map[frozenset(u_color_neighbourhood.items())] = colors_old[u]
 
                     # Assign colors to vertices
-                    colors[u] = c_map[frozenset(u_color_neighbourhood.items())]
-                    colors[v] = c_map[frozenset(v_color_neighbourhood.items())]
+                    colors[u] = c_map[frozenset(u_color_neighbourhood.items())]  # the neighbourhood color configuration
+                    colors[v] = c_map[frozenset(v_color_neighbourhood.items())]  # the neighbourhood color configuration
                 else:
                     # If the two nodes don't share the same neighbourhood
                     # Make a new color for one of them
@@ -60,10 +60,10 @@ def is_isomorph(G, B):
 
 
 # Load graph
-with open('examplegraph.gr') as f:
+with open('examplegraph2.gr') as f:
     G1 = load_graph(f)
 
-with open('examplegraph2.gr') as f:
+with open('colorref_largeexample_6_960.grl') as f:
     G2 = load_graph(f)
 
 # Apply function
