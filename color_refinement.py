@@ -4,9 +4,13 @@ from graph_io import load_graph, write_dot
 from itertools import product
 
 
-def color_refinement(G: "Graph"):
+def color_refinement(G: "Graph", reset = True):
     # Initialize colors for every vertex
-    colors = {v: v.degree for v in G.vertices}
+    colors = {}
+    if reset:
+        colors = {v: v.degree for v in G.vertices}
+    else:
+        colors = {v: v.color for v in G.vertices}
     # Find the highest color value
     last_color = max([c for k, c in colors.items()])
     # Stores version of color configuration from previous loop iteration
@@ -43,8 +47,8 @@ def color_refinement(G: "Graph"):
 
     # Make labels the color number and graph colorful
     for v in G.vertices:
-        v.label = colors[v]
-        v.colornum = v.label
+        v.color = colors[v]
+        v.colornum = v.color
     return colors
 
 # Load graph

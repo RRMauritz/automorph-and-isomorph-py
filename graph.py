@@ -496,6 +496,10 @@ class Graph(object):
 
         return True
 
+    @property
+    def max_color(self) -> int:
+        return max([v.color for v in self.vertices])
+
 
 class UnsafeGraph(Graph):
     @property
