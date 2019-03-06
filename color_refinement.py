@@ -6,7 +6,7 @@ from itertools import product
 
 def color_refinement(G: "Graph"):
     # Initialize colors for every vertex
-    #colors = {v: 0 for v in G.vertices} # Optional for initializing everything to 0
+    # colors = {v: 0 for v in G.vertices} # Optional for initializing everything to 0
     colors = {v: v.degree for v in G.vertices}
     # Find the highest color value
     last_color = max([c for k, c in colors.items()])
