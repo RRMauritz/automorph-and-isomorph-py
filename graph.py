@@ -7,6 +7,7 @@ This is a module for working with directed and undirected multigraphs.
 from typing import List, Union, Set
 import itertools as it
 import copy as cp
+import heapq as queue
 
 class GraphError(Exception):
     """
@@ -43,7 +44,7 @@ class Vertex(object):
 
         self._graph = graph
         self.label = label
-        self.parent = ""
+        self.parent = "A"
         self.color = 0
         self._incidence = {}
 
@@ -362,6 +363,7 @@ class Graph(object):
 
         res = cp.deepcopy(self)
         temp = cp.deepcopy(other)
+
         alpha = self.__len__()
         for v in temp.vertices:
             v.label += alpha
@@ -371,6 +373,46 @@ class Graph(object):
         for e in temp.edges:
             res.add_edge(e)
         return res
+
+    def create_dsu(self, graphs: 'list'):
+
+        if len(graphs) == 0:
+            return self
+        else:
+            temp = graphs[0]
+            graphs.remove(temp)
+            self = self + temp
+            return self.create_dsu(graphs)
+
+    def split_disjoint(self):
+        """"
+        Split a graph into sub-graphs based on the parent-label
+        :return sub-graphs which formed the original graph
+        """
+        G1 = Graph(self.directed, 0, self.simple)
+        G2 = Graph(self.directed, 0, self.simple)
+
+        temp = cp.deepcopy(self)
+        for v in temp.vertices:
+            if v.parent == "A":
+                v._graph = G1
+                G1.add_vertex(v)
+            else:
+                v._graph = G2
+                # v.parent = "A"
+                G2.add_vertex(v)
+
+        for e in temp.edges:
+            if e.tail.parent == "A":
+                G1.add_edge(e)
+            else:
+                G2.add_edge(e)
+
+        for v in G2.vertices:
+            v.parent = "A"
+        return G1, G2
+
+
 
 
     def __iadd__(self, other: Union[Edge, Vertex]) -> "Graph":
