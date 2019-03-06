@@ -9,6 +9,7 @@ import itertools as it
 import copy as cp
 import heapq as queue
 
+
 class GraphError(Exception):
     """
     An error that occurs while manipulating a `Graph`
@@ -44,7 +45,7 @@ class Vertex(object):
 
         self._graph = graph
         self.label = label
-        self.parent = "A"
+        self.parent = 0
         self.color = 0
         self._incidence = {}
 
@@ -312,7 +313,6 @@ class Graph(object):
                 self.del_edge(e)
             self._v.remove(vertex)
 
-
     def add_edge(self, edge: "Edge"):
         """
         Add an edge to the graph. And if necessary also the vertices.
@@ -364,10 +364,12 @@ class Graph(object):
         res = cp.deepcopy(self)
         temp = cp.deepcopy(other)
 
+        max_parentvalue = sorted([v.parent for v in self.vertices], reverse=True)[0]
+
         alpha = self.__len__()
         for v in temp.vertices:
             v.label += alpha
-            v.parent = "B"
+            v.parent = max_parentvalue + 1
             v._graph = res
             res.add_vertex(v)
         for e in temp.edges:
@@ -391,10 +393,11 @@ class Graph(object):
         """
         G1 = Graph(self.directed, 0, self.simple)
         G2 = Graph(self.directed, 0, self.simple)
+        max_parentvalue = sorted([v.parent for v in self.vertices])[0]
 
         temp = cp.deepcopy(self)
         for v in temp.vertices:
-            if v.parent == "A":
+            if v.parent == max_parentvalue:
                 v._graph = G1
                 G1.add_vertex(v)
             else:
@@ -403,17 +406,11 @@ class Graph(object):
                 G2.add_vertex(v)
 
         for e in temp.edges:
-            if e.tail.parent == "A":
+            if e.tail.parent == max_parentvalue:
                 G1.add_edge(e)
             else:
                 G2.add_edge(e)
-
-        for v in G2.vertices:
-            v.parent = "A"
         return G1, G2
-
-
-
 
     def __iadd__(self, other: Union[Edge, Vertex]) -> "Graph":
         """
