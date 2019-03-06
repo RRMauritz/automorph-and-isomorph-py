@@ -412,6 +412,48 @@ class Graph(object):
         return v in u.neighbours and (not self.directed
                                       or any(e.head == v for e in u.incidence))
 
+    def _isCyclicUtil(self, v, visited, parent):
+
+        # Mark current node as visited
+        visited[v] = True
+
+        # Recur for all the vertices adjacent
+        # for this vertex
+        for i in v.neighbours:
+            # If an adjacent is not visited,
+            # then recur for that adjacent
+            if i not in visited:
+                if self._isCyclicUtil(i, visited, v) == True:
+                    return True
+
+            # If an adjacent is visited and not
+            # parent of current vertex, then there
+            # is a cycle.
+            elif i != parent:
+                return True
+
+        return False
+
+    def is_tree(self):
+        # Mark all the vertices as not visited
+        # and not part of recursion stack
+        visited = {}
+        # The call to isCyclicUtil serves multiple
+        # purposes. It returns true if graph reachable
+        # from vertex 0 is cyclcic. It also marks
+        # all vertices reachable from 0.
+        if self._isCyclicUtil(self.vertices[0], visited, None):
+            return False
+
+        # If we find a vertex which is not reachable
+        # from 0 (not marked by isCyclicUtil(),
+        # then we return false
+        for i in self.vertices:
+            if visited[i] == False:
+                return False
+
+        return True
+
 
 class UnsafeGraph(Graph):
     @property
