@@ -44,6 +44,7 @@ class Vertex(object):
         self._graph = graph
         self.label = label
         self.parent = ""
+        self.color = 0
         self._incidence = {}
 
     def __repr__(self):
