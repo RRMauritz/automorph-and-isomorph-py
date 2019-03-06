@@ -49,29 +49,13 @@ def color_refinement(G: "Graph"):
 
     return colors
 
-
-# Determine whether two graphs are isomophic by comparing their partitions
-def is_isomorph(G, B):
-    # Make sorted list of the number of occurences of each color
-    g_part = sorted(Counter(color_refinement(G).values()).values())
-    b_part = sorted(Counter(color_refinement(B).values()).values())
-    # Compare them by length and content
-    return g_part == b_part
-
-
 # Load graph
 with open('./colorref_smallexample_4_16.grl') as f:
-    G = load_graph(f, read_list = True)
+    G1 = load_graph(f)
 
 # Apply function
-color_refinement(G[0][0])
-color_refinement(G[0][1])
+color_refinement(G1)
 
 # Write the dot file
-with open('colored0.dot', 'w') as f:
-    write_dot(G[0][0], f)
-with open('colored1.dot', 'w') as f:
-    write_dot(G[0][1], f)
-
-# Test for isomorphism
-print(is_isomorph(G[0][0], G[0][1]))
+with open('colored.dot', 'w') as f:
+    write_dot(G1, f)
