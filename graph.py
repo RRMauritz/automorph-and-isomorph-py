@@ -5,7 +5,8 @@ This is a module for working with directed and undirected multigraphs.
 # version: 01-02-2017, Pieter Bos, Tariq Bontekoe
 
 from typing import List, Union, Set
-
+import itertools as it
+import copy as cp
 
 class GraphError(Exception):
     """
@@ -42,6 +43,8 @@ class Vertex(object):
 
         self._graph = graph
         self.label = label
+        self.parent = ""
+        self.color = 0
         self._incidence = {}
 
     def __repr__(self):
@@ -356,8 +359,19 @@ class Graph(object):
         :param other: Graph to add to `self'.
         :return: New graph which is a disjoint union of `self' and `other'.
         """
-        # TODO: implementation
-        pass
+
+        res = cp.deepcopy(self)
+        temp = cp.deepcopy(other)
+        alpha = self.__len__()
+        for v in temp.vertices:
+            v.label += alpha
+            v.parent = "B"
+            v._graph = res
+            res.add_vertex(v)
+        for e in temp.edges:
+            res.add_edge(e)
+        return res
+
 
     def __iadd__(self, other: Union[Edge, Vertex]) -> "Graph":
         """
