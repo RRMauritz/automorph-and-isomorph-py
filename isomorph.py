@@ -38,14 +38,23 @@ def count_isomorphisms(X: "Graph", Y: "Graph"):
         return 1
 
     # Get all color classes with size >= 2 in both graphs
-    color_classes = [
-        c for c, n in Counter([v.color for v in A.vertices]).items() if n >= 2
-    ]
+    color_classes = [{
+        "color": c,
+        "n": n,
+        "degree": A.degree_of_color(c)
+    } for c, n in Counter([v.color for v in A.vertices]).items() if n >= 2]
 
     ##################################
     #### Selection of color class ####
     ##################################
-    refinement_color = color_classes[0]
+    # Select color by number of vertices
+    refinement_color = max(color_classes, key = lambda c: c["n"])["color"] 
+
+    # Select first color
+    # refinement_color = color_classes[0]["color"] 
+
+    # Select color by degree
+    #refinement_color = min(color_classes, key = lambda c: c["degree"])["color"]
 
     # All vertices in A of that color
     color_vertices = [v for v in A.vertices if v.color == refinement_color]

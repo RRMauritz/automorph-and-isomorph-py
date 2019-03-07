@@ -9,6 +9,7 @@ import itertools as it
 import copy as cp
 import heapq as queue
 
+
 class GraphError(Exception):
     """
     An error that occurs while manipulating a `Graph`
@@ -312,7 +313,6 @@ class Graph(object):
                 self.del_edge(e)
             self._v.remove(vertex)
 
-
     def add_edge(self, edge: "Edge"):
         """
         Add an edge to the graph. And if necessary also the vertices.
@@ -412,9 +412,6 @@ class Graph(object):
             v.parent = "A"
         return G1, G2
 
-
-
-
     def __iadd__(self, other: Union[Edge, Vertex]) -> "Graph":
         """
         Add either an `Edge` or `Vertex` with the += syntax.
@@ -499,6 +496,10 @@ class Graph(object):
     @property
     def max_color(self) -> int:
         return max([v.color for v in self.vertices])
+
+    def degree_of_color(self, c) -> int:
+        return max([v.degree for v in self.vertices if v.color == c],
+                   default=0)
 
 
 class UnsafeGraph(Graph):
