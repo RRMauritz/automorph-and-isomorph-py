@@ -59,7 +59,7 @@ def count_isomorphisms(X: "Graph", Y: "Graph"):
         u.color = v.color
         u.colornum = v.colornum
         # Recursion step
-        num += count_isomorphisms(A, B, debug=debug)
+        num += count_isomorphisms(A, B)
         # Change color back so another vertex can get colored
         u.color = old_u_color
         u.colornum = old_u_color
