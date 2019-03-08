@@ -17,7 +17,7 @@ def is_bijective(A, B):
     return a == b and len(a) == len(A.vertices) and len(b) == len(B.vertices)
 
 
-def count_isomorphisms(X: "Graph", Y: "Graph"):
+def count_isomorphisms(X: "Graph", Y: "Graph", count=True):
     # If the number of vertices or edges is different they cannot be
     # isomophic
     if not len(X.vertices) == len(Y.vertices) or not len(X.edges) == len(
@@ -35,6 +35,9 @@ def count_isomorphisms(X: "Graph", Y: "Graph"):
     if is_unbalanced(A, B):
         return 0
     elif is_bijective(A, B):
+        if not count:
+            print("Graphs are isomorphic")
+            sys.exit(0)
         return 1
 
     # Get all color classes with size >= 2 in both graphs
@@ -74,7 +77,7 @@ def count_isomorphisms(X: "Graph", Y: "Graph"):
         u.color = v.color
         u.colornum = v.colornum
         # Recursion step
-        num += count_isomorphisms(A, B)
+        num += count_isomorphisms(A, B, count=count)
         # Change color back so another vertex can get colored
         u.color = old_u_color
         u.colornum = old_u_color
@@ -87,7 +90,7 @@ if len(sys.argv) > 3:
 
     A = graph_list[0][int(sys.argv[2])]
     B = graph_list[0][int(sys.argv[3])]
-    print("Number of isomorphs: ", count_isomorphisms(A, B))
+    print("Number of isomorphs: ", count_isomorphisms(A, B, count=True))
 else:
     print("Need 3 arguments: %filename% %graph#1% %graph#2%")
     print("The graph numbers refer to the indexes in the list of graphs")
