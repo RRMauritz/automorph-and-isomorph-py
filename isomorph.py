@@ -51,16 +51,20 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     #### Selection of color class ####
     ##################################
     # Select color by number of vertices
-    refinement_color = max(color_classes, key = lambda c: c["n"])["color"] 
+    ref_c_class = max(color_classes, key=lambda c: c["n"])
+
+    # Select color by number of vertices and degree
+    #ref_c_class = max(color_classes, key=lambda c: (c["n"], c["degree"]))
 
     # Select first color
-    # refinement_color = color_classes[0]["color"] 
+    #ref_c_class = color_classes[0]
 
     # Select color by degree
-    #refinement_color = min(color_classes, key = lambda c: c["degree"])["color"]
+    #ref_c_class = min(color_classes, key=lambda c: c["degree"])
 
     # All vertices in A of that color
-    color_vertices = [v for v in A.vertices if v.color == refinement_color]
+    ref_c = ref_c_class["color"]
+    color_vertices = [v for v in A.vertices if v.color == ref_c]
 
     # Choose a vertice
     v = color_vertices[0]
@@ -70,7 +74,7 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     v.colornum = v.color
 
     num = 0
-    for u in [k for k in B.vertices if k.color == refinement_color]:
+    for u in [k for k in B.vertices if k.color == ref_c]:
         # Save old color
         old_u_color = u.color
         # Make the vertices the same color
@@ -90,8 +94,16 @@ if len(sys.argv) > 3:
 
     A = graph_list[0][int(sys.argv[2])]
     B = graph_list[0][int(sys.argv[3])]
-    print("Number of isomorphs: ", count_isomorphisms(A, B, count_isomorphs=True))
+    c_iso = True
+    if len(sys.argv) > 4:
+        print("Stopping after one automorph is found")
+        c_iso = False
+
+    print("Number of isomorphs: ",
+          count_isomorphisms(A, B, count_isomorphs=c_iso))
 else:
     print("Need 3 arguments: %filename% %graph#1% %graph#2%")
     print("The graph numbers refer to the indexes in the list of graphs")
     print("Example: 'python isomorph.py graphs/torus24.grl 0 3'")
+    print("Add an additional arbitrary argument to stop the process once")
+    print("a single automorph has been found")
