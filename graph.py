@@ -118,6 +118,24 @@ class Vertex(object):
         """
         return sum(map(len, self._incidence.values()))
 
+    def twins(self, other: "Vertex"):
+        """"
+        Determines whether two vertices are true or false twins
+        Return 0 if no twins, 1 if twins, 2 if false twins
+        """
+        neigh1 = set(self.neighbours)
+        neigh2 = set(other.neighbours)
+        if self.is_adjacent(other):
+            neigh1.remove(other)
+            neigh2.remove(self)
+            if neigh1 == neigh2:
+                return 1
+            else: return 0
+        else:
+            if neigh1 == neigh2:
+                return 2
+            else: return 0
+
 
 class Edge(object):
     """
@@ -301,6 +319,22 @@ class Graph(object):
                 "A vertex must belong to the graph it is added to")
 
         self._v.append(vertex)
+
+    def twins(self):
+        """"
+        This algorithm checks for the twin-sets in the graph.
+        Complexity: O(n^2), where n is the number of vertices
+        """
+        checked_vertices = list()
+        passed = list()
+        res = list()
+        for x in self.vertices:
+            passed.append(x)
+            forloop = [d for d in self.vertices if d not in passed]
+            for y in forloop:
+                if x.twins(y) > 0:
+                   res.append((x, y))
+        return res
 
     def del_vertex(self, vertex: "Vertex"):
         """
