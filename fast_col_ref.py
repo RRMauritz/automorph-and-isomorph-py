@@ -1,6 +1,7 @@
 from graph import *
 from collections import deque
 
+
 def color_refinement(G: "Graph", reset_colors=True):
     # Assign colormap: Color -> [Vertices]
     color_classes = {}
@@ -28,7 +29,6 @@ def color_refinement(G: "Graph", reset_colors=True):
     color_stack = deque(
         sorted([k for k, _ in color_classes.items()],
                key=lambda c: len(color_classes[c])))
-    print("Color stack", color_stack)
 
     while color_stack:
         # Choose the color class with the lowest amount of vertices
