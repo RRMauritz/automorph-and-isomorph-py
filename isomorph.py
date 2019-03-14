@@ -1,7 +1,7 @@
 from graph import *
 from graph_io import *
 from collections import Counter
-from color_refinement import color_refinement
+from fast_col_ref import color_refinement
 import sys
 
 
