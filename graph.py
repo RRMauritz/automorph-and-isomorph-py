@@ -130,11 +130,13 @@ class Vertex(object):
             neigh2.remove(self)
             if neigh1 == neigh2:
                 return 1
-            else: return 0
+            else:
+                return 0
         else:
             if neigh1 == neigh2:
                 return 2
-            else: return 0
+            else:
+                return 0
 
 
 class Edge(object):
@@ -333,7 +335,7 @@ class Graph(object):
             forloop = [d for d in self.vertices if d not in passed]
             for y in forloop:
                 if x.twins(y) > 0:
-                   res.append((x, y))
+                    res.append((x, y))
         return res
 
     def del_vertex(self, vertex: "Vertex"):
