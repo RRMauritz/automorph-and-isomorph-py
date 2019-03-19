@@ -1,5 +1,5 @@
 from graph_io import *
-from color_refinement import color_refinement
+from fast_col_ref import color_refinement
 import sys
 
 # Use color_refinement on one graph and print the .dot file
