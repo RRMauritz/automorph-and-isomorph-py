@@ -230,7 +230,8 @@ def write_dot(graph: Graph, f: IO[str], directed=False):
     for e in graph.edges:
         options = 'penwidth=2,'
         if hasattr(e, 'weight'):
-            options += 'label="' + str(e.weight) + '",'
+            #options += 'label="' + str(e.weight) + '",'
+            options += 'label="",'
         if hasattr(e, 'colortext'):
             options += 'color="' + e.colortext + '",'
         elif hasattr(e, 'colornum'):

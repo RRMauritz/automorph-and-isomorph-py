@@ -88,22 +88,23 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     return num
 
 
-if len(sys.argv) > 3:
-    with open(sys.argv[1]) as f:
-        graph_list = load_graph(f, read_list=True)
+if __name__ == "__main__":
+    if len(sys.argv) > 3:
+        with open(sys.argv[1]) as f:
+            graph_list = load_graph(f, read_list=True)
 
-    A = graph_list[0][int(sys.argv[2])]
-    B = graph_list[0][int(sys.argv[3])]
-    c_iso = True
-    if len(sys.argv) > 4:
-        print("Stopping after one automorph is found")
-        c_iso = False
+        A = graph_list[0][int(sys.argv[2])]
+        B = graph_list[0][int(sys.argv[3])]
+        c_iso = True
+        if len(sys.argv) > 4:
+            print("Stopping after one automorph is found")
+            c_iso = False
 
-    print("Number of isomorphs: ",
-          count_isomorphisms(A, B, count_isomorphs=c_iso))
-else:
-    print("Need 3 arguments: %filename% %graph#1% %graph#2%")
-    print("The graph numbers refer to the indexes in the list of graphs")
-    print("Example: 'python isomorph.py graphs/torus24.grl 0 3'")
-    print("Add an additional arbitrary argument to stop the process once")
-    print("a single automorph has been found")
+        print("Number of isomorphs: ",
+              count_isomorphisms(A, B, count_isomorphs=c_iso))
+    else:
+        print("Need 3 arguments: %filename% %graph#1% %graph#2%")
+        print("The graph numbers refer to the indexes in the list of graphs")
+        print("Example: 'python isomorph.py graphs/torus24.grl 0 3'")
+        print("Add an additional arbitrary argument to stop the process once")
+        print("a single automorph has been found")
