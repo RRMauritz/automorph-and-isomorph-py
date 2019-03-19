@@ -17,6 +17,23 @@ def is_bijective(A, B):
     return a == b and len(a) == len(A.vertices) and len(b) == len(B.vertices)
 
 
+"""
+TODO: Maintain a passed list (?)
+TODO: verify on bigger graphs
+"""
+def colour_twins(A: "Graph", B: "Graph"):
+    twins_a = A.twins2()
+    twins_b = B.twins2()
+    for twina in twins_a:
+        for twinb in twins_b:
+            if twina[0].neighbours == twinb[0].neighbours:
+                twina[0].color = A.max_color + 1
+                twinb[0].color = B.max_color + 1
+            else:
+                break
+        continue
+
+
 def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     # If the number of vertices or edges is different they cannot be
     # isomophic
@@ -28,8 +45,10 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     U = X + Y
     # Apply color refinement
     color_refinement(U, reset_colors=False)
+
     # Split the union up again
     A, B = U.split_disjoint()
+    colour_twins(A, B)
 
     # Check for unbalancy and bijectivity for early recursion exit
     if is_unbalanced(A, B):
