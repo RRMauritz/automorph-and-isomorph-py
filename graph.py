@@ -535,6 +535,10 @@ class Graph(object):
         return max([v.degree for v in self.vertices if v.color == c],
                    default=0)
 
+    def reset_labels(self):
+        for i, v in enumerate(self.vertices):
+            v.label = i
+
 
 class UnsafeGraph(Graph):
     @property
