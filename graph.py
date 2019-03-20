@@ -311,6 +311,10 @@ class Graph(object):
         """
         return len(self._v)
 
+    def is_connected(self):
+        verts = len(self.vertices)
+        return len(self.edges) == (verts*(verts-1))//2
+
     def add_vertex(self, vertex: "Vertex"):
         """
         Add a vertex to the graph.
@@ -322,21 +326,55 @@ class Graph(object):
 
         self._v.append(vertex)
 
-    def twins(self):
+    def twins(self): #TODO: improve exact vs coloured neighbourhood --> apply after colour refinement once
         """"
         This algorithm checks for the twin-sets in the graph.
         Complexity: O(n^2), where n is the number of vertices
         """
         checked_vertices = list()
         passed = list()
-        res = list()
+        true_twins = list()
+        false_twins = list()
         for x in self.vertices:
             passed.append(x)
             forloop = [d for d in self.vertices if d not in passed]
             for y in forloop:
-                if x.twins(y) > 0:
-                    res.append((x, y))
+                check = x.twins(y)
+                if check > 0:
+                    if check > 1:
+                        true_twins.append((x, y))
+                    else:
+                        false_twins.append((x, y))
+        return true_twins, false_twins
+
+    def twins2(self):
+        """
+        Twins seems faster than twins2, assumption lies in looplist creation.
+        Can this be improved (TODO?)
+        Assumes colour refinement has been applied. This is a hard req
+        :return:
+        """
+        res = list()
+        looplist = dict()
+        for x in self.vertices:
+            if looplist.get(x.color):
+                looplist[x.color].append(x)
+            else:
+                looplist[x.color] = list()
+                looplist[x.color].append(x)
+        for k in looplist.keys():
+            dd = list()
+            if len(looplist[k]) == 1:
+                continue
+            else:
+                for d in looplist[k]:
+                    dd.append(d)
+                    forloop = [d for d in looplist[k] if d not in dd]
+                    for ddd in forloop:
+                        if d.twins(ddd):
+                            res.append((d, ddd))
         return res
+
 
     def del_vertex(self, vertex: "Vertex"):
         """

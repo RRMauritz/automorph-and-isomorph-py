@@ -1,3 +1,5 @@
+from math import factorial
+
 from graph import *
 from graph_io import *
 from collections import Counter
@@ -21,22 +23,38 @@ def is_bijective(A, B):
 TODO: Maintain a passed list (?)
 TODO: verify on bigger graphs
 """
+
+
 def colour_twins(A: "Graph", B: "Graph"):
-    twins_a = A.twins2()
-    twins_b = B.twins2()
+    true_twins_a, false_twins_a  = A.twins()
+    true_twins_b, false_twins_b = B.twins()
+    twins_a = true_twins_a + false_twins_a
     for twina in twins_a:
-        for twinb in twins_b:
-            if twina[0].neighbours == twinb[0].neighbours:
+        for twinb in true_twins_b + false_twins_b:
+            if [d.color for d in twina[0].neighbours] == [d.color for d in twinb[0].neighbours]:
                 twina[0].color = A.max_color + 1
                 twinb[0].color = B.max_color + 1
-            else:
                 break
+            else:
+                continue
         continue
+    res = set()
+    print("A is connected: ", A.is_connected())
+    if A.is_connected():
+        print("Im connected!")
+        return factorial(len(twins_a))
+    else:
+        print("Im not connected!")
+        for twin in twins_a:
+            res.add(twin[0])
+            res.add(twin[1])
+        print(res)
+        return 2**len(res)
 
 
 def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     # If the number of vertices or edges is different they cannot be
-    # isomophic
+    # isomorphic
     if not len(X.vertices) == len(Y.vertices) or not len(X.edges) == len(
             Y.edges):
         return 0
@@ -46,9 +64,21 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     # Apply color refinement
     color_refinement(U, reset_colors=False)
 
+
+
     # Split the union up again
     A, B = U.split_disjoint()
-    colour_twins(A, B)
+    # for v in A.vertices:
+    #     v.colornum = v.color
+    # with open('colored1.dot', 'w') as f:
+    #     write_dot(A, f)
+
+    twin_count = colour_twins(A, B)
+
+    # for v in A.vertices:
+    #     v.colornum = v.color
+    # with open('colored2.dot', 'w') as g:
+    #     write_dot(A, g)
 
     # Check for unbalancy and bijectivity for early recursion exit
     if is_unbalanced(A, B):
@@ -73,13 +103,13 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     ref_c_class = max(color_classes, key=lambda c: c["n"])
 
     # Select color by number of vertices and degree
-    #ref_c_class = max(color_classes, key=lambda c: (c["n"], c["degree"]))
+    # ref_c_class = max(color_classes, key=lambda c: (c["n"], c["degree"]))
 
     # Select first color
-    #ref_c_class = color_classes[0]
+    # ref_c_class = color_classes[0]
 
     # Select color by degree
-    #ref_c_class = min(color_classes, key=lambda c: c["degree"])
+    # ref_c_class = min(color_classes, key=lambda c: c["degree"])
 
     # All vertices in A of that color
     ref_c = ref_c_class["color"]
@@ -104,7 +134,8 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
         # Change color back so another vertex can get colored
         u.color = old_u_color
         u.colornum = old_u_color
-    return num
+    print("Num: ", num, "twin_count: ", twin_count)
+    return num * twin_count
 
 
 if len(sys.argv) > 3:
