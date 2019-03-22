@@ -1,10 +1,10 @@
 from math import factorial
-
 from graph import *
 from graph_io import *
 from collections import Counter
 from fast_col_ref import color_refinement
 import sys
+from basicpermutationgroup import *
 
 
 def is_unbalanced(A, B):
@@ -26,7 +26,7 @@ TODO: verify on bigger graphs
 
 
 def colour_twins(A: "Graph", B: "Graph"):
-    true_twins_a, false_twins_a  = A.twins()
+    true_twins_a, false_twins_a = A.twins()
     true_twins_b, false_twins_b = B.twins()
     twins_a = true_twins_a + false_twins_a
     for twina in twins_a:
@@ -49,7 +49,36 @@ def colour_twins(A: "Graph", B: "Graph"):
             res.add(twin[0])
             res.add(twin[1])
         print(res)
-        return 2**len(res)
+        return 2 ** len(res)
+
+
+def membership_test(H: "list", f: "permutation"):
+    if f.istrivial():
+        return True
+    alpha = FindNonTrivialOrbit(H)
+    orbit, transversal = Orbit(H, alpha, True)
+    im = f.__getitem__(alpha)
+    if im not in orbit:
+        return False
+    else:
+        u = next(v for v in transversal if v.__getitem__(alpha) == im)
+        return membership_test(Stabilizer(H, alpha), -u * f)
+
+
+def cardinality_generating_set(H: "list"):
+    """"
+    Given a generating set for the Aut(G) group, this method returns the cardinality of this generating set
+    that is, the number of automorphisms there actually are in the graph
+    :param H: the generating set
+    """
+
+    alpha = FindNonTrivialOrbit(H)
+    if alpha is not None:
+        length_orbit = Orbit(H, alpha, False).__len__()
+        stab = Stabilizer(H, alpha)
+        return length_orbit * cardinality_generating_set(stab)
+    else:
+        return 1
 
 
 def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
@@ -63,8 +92,6 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
     U = X + Y
     # Apply color refinement
     color_refinement(U, reset_colors=False)
-
-
 
     # Split the union up again
     A, B = U.split_disjoint()
