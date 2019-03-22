@@ -19,7 +19,7 @@ import sys
 
 perm1 = permutation(6, mapping=[0, 1, 2, 3, 5, 4])
 perm2 = permutation(6, mapping=[0, 2, 1, 3, 4, 5])
-f = permutation(6, mapping=[0, 1, 3, 2, 5, 4])
+f = permutation(6, mapping=[0, 2, 1, 3, 5, 4])
 gen_set = list()
 gen_set.append(perm1)
 gen_set.append(perm2)

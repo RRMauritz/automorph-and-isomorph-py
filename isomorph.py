@@ -58,14 +58,11 @@ def membership_test(H: "list", f: "permutation"):
     alpha = FindNonTrivialOrbit(H)
     orbit, transversal = Orbit(H, alpha, True)
     im = f.__getitem__(alpha)
-    if im not in orbit:
+    u = next(v for v in transversal if v.__getitem__(alpha) == im)
+    if u.istrivial():
         return False
     else:
-        u = next(v for v in transversal if v.__getitem__(alpha) == im)
-        if u.istrivial():
-            return False
-        else:
-            return membership_test(Stabilizer(H, alpha), -u * f)
+        return membership_test(Stabilizer(H, alpha), -u * f)
 
 
 def cardinality_generating_set(H: "list"):
