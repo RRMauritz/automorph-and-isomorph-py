@@ -62,7 +62,10 @@ def membership_test(H: "list", f: "permutation"):
         return False
     else:
         u = next(v for v in transversal if v.__getitem__(alpha) == im)
-        return membership_test(Stabilizer(H, alpha), -u * f)
+        if u.istrivial():
+            return False
+        else:
+            return membership_test(Stabilizer(H, alpha), -u * f)
 
 
 def cardinality_generating_set(H: "list"):
