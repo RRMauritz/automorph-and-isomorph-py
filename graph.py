@@ -46,6 +46,7 @@ class Vertex(object):
         self._graph = graph
         self.label = label
         self.parent = "A"
+        self._old_label = label
         self.color = 0
         self._incidence = {}
 
@@ -366,6 +367,7 @@ class Graph(object):
 
         alpha = self.__len__()
         for v in temp.vertices:
+            v._old_label = v.label
             v.label += alpha
             v.parent = "B"
             v._graph = res
@@ -394,6 +396,7 @@ class Graph(object):
 
         temp = cp.deepcopy(self)
         for v in temp.vertices:
+            v.label = v._old_label
             if v.parent == "A":
                 v._graph = G1
                 G1.add_vertex(v)
