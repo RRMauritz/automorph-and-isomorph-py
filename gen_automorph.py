@@ -3,6 +3,9 @@ from fast_col_ref import color_refinement
 from enum import Enum
 from collections import Counter
 from permv2 import *
+from isomorph import membership_test
+from graph_io import *
+import sys
 
 
 def is_unbalanced(A, B):
@@ -44,7 +47,7 @@ def gen_rec(A: "Graph",
             # Mapping is completely trivial
             return Case.IN_AUT
         # TODO check if X is already a member of the generating set
-        elif is_member_of(X, G):
+        elif membership_test(G, X):
             # Is already member
             return Case.IN_AUT
         else:
@@ -109,3 +112,9 @@ def gen_auto_set(G: "Graph"):
     X = list()
     gen_rec(G, G, X)
     return X
+
+
+if __name__ == "__main__":
+    with open(sys.argv[1]) as f:
+        G = load_graph(f)
+    print(gen_auto_set(G))
