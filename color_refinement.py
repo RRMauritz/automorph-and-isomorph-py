@@ -9,7 +9,7 @@ def color_refinement(G: "Graph", reset_colors=True):
     # Initialize colors for every vertex
     colors = {}
     if reset_colors:
-        colors = {v.label: v.degree for v in G.vertices}
+        colors = {v.label: v.degree for v in G.vertices} # dictionary where key = v.label and its corresponding value is the degree
     else:
         colors = {v.label: v.color for v in G.vertices}
     # Find the highest color value
@@ -17,6 +17,7 @@ def color_refinement(G: "Graph", reset_colors=True):
     # Stores version of color configuration from previous loop iteration
     colors_old = {}
     # Keeps track of colors used for certain neighbourhoods
+
     for v in G.vertices:
         v.colornum = colors[v.label]
 

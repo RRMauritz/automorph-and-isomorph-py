@@ -45,7 +45,6 @@ class Vertex(object):
 
         self._graph = graph
         self.label = label
-        self.parent = "A"
         self._old_label = label
         self.color = 0
         self._incidence = {}
@@ -118,6 +117,26 @@ class Vertex(object):
         Returns the degree of the vertex
         """
         return sum(map(len, self._incidence.values()))
+
+    def twins(self, other: "Vertex"):
+        """"
+        Determines whether two vertices are true or false twins
+        Return 0 if no twins, 1 if twins, 2 if false twins
+        """
+        neigh1 = set(self.neighbours)
+        neigh2 = set(other.neighbours)
+        if self.is_adjacent(other):
+            neigh1.remove(other)
+            neigh2.remove(self)
+            if neigh1 == neigh2:
+                return 1
+            else:
+                return 0
+        else:
+            if neigh1 == neigh2:
+                return 2
+            else:
+                return 0
 
 
 class Edge(object):
@@ -292,6 +311,10 @@ class Graph(object):
         """
         return len(self._v)
 
+    def is_connected(self):
+        verts = len(self.vertices)
+        return len(self.edges) == (verts*(verts-1))//2
+
     def add_vertex(self, vertex: "Vertex"):
         """
         Add a vertex to the graph.
@@ -302,6 +325,56 @@ class Graph(object):
                 "A vertex must belong to the graph it is added to")
 
         self._v.append(vertex)
+
+    def twins(self): #TODO: improve exact vs coloured neighbourhood --> apply after colour refinement once
+        """"
+        This algorithm checks for the twin-sets in the graph.
+        Complexity: O(n^2), where n is the number of vertices
+        """
+        checked_vertices = list()
+        passed = list()
+        true_twins = list()
+        false_twins = list()
+        for x in self.vertices:
+            passed.append(x)
+            forloop = [d for d in self.vertices if d not in passed]
+            for y in forloop:
+                check = x.twins(y)
+                if check > 0:
+                    if check > 1:
+                        true_twins.append((x, y))
+                    else:
+                        false_twins.append((x, y))
+        return true_twins, false_twins
+
+    def twins2(self):
+        """
+        Twins seems faster than twins2, assumption lies in looplist creation.
+        Can this be improved (TODO?)
+        Assumes colour refinement has been applied. This is a hard req
+        :return:
+        """
+        res = list()
+        looplist = dict()
+        for x in self.vertices:
+            if looplist.get(x.color):
+                looplist[x.color].append(x)
+            else:
+                looplist[x.color] = list()
+                looplist[x.color].append(x)
+        for k in looplist.keys():
+            dd = list()
+            if len(looplist[k]) == 1:
+                continue
+            else:
+                for d in looplist[k]:
+                    dd.append(d)
+                    forloop = [d for d in looplist[k] if d not in dd]
+                    for ddd in forloop:
+                        if d.twins(ddd):
+                            res.append((d, ddd))
+        return res
+
 
     def del_vertex(self, vertex: "Vertex"):
         """
@@ -365,11 +438,13 @@ class Graph(object):
         res = cp.deepcopy(self)
         temp = cp.deepcopy(other)
 
+        max_parentvalue = sorted([v.parent for v in self.vertices], reverse=True)[0]
+
         alpha = self.__len__()
         for v in temp.vertices:
             v._old_label = v.label
             v.label += alpha
-            v.parent = "B"
+            v.parent = max_parentvalue + 1
             v._graph = res
             res.add_vertex(v)
         for e in temp.edges:
@@ -393,11 +468,12 @@ class Graph(object):
         """
         G1 = Graph(self.directed, 0, self.simple)
         G2 = Graph(self.directed, 0, self.simple)
+        max_parentvalue = sorted([v.parent for v in self.vertices])[0]
 
         temp = cp.deepcopy(self)
         for v in temp.vertices:
             v.label = v._old_label
-            if v.parent == "A":
+            if v.parent == max_parentvalue:
                 v._graph = G1
                 G1.add_vertex(v)
             else:
@@ -406,13 +482,10 @@ class Graph(object):
                 G2.add_vertex(v)
 
         for e in temp.edges:
-            if e.tail.parent == "A":
+            if e.tail.parent == max_parentvalue:
                 G1.add_edge(e)
             else:
                 G2.add_edge(e)
-
-        for v in G2.vertices:
-            v.parent = "A"
         return G1, G2
 
     def __iadd__(self, other: Union[Edge, Vertex]) -> "Graph":
