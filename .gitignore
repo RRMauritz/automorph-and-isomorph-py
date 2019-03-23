@@ -2,6 +2,10 @@
 # Created by https://www.gitignore.io/api/vim,macos,linux,windows,pycharm+all
 # Edit at https://www.gitignore.io/?templates=vim,macos,linux,windows,pycharm+all
 
+## Custom stuff for this project
+*.dot
+*.png
+
 ### Linux ###
 *~
 
