@@ -31,9 +31,9 @@ class Case(Enum):
 # is_trivial shows whether the current step is trivial
 def gen_rec(A: "Graph",
             B: "Graph",
-            X: "List" = [],
+            X: "permutation" = permutation(),
             is_trivial=False,
-            G: "permutation" = permutation()):
+            G: "List" = []):
     # Do coloring
     U = A + B
     color_refinement(U, reset_colors=False)
@@ -43,7 +43,7 @@ def gen_rec(A: "Graph",
         return Case.UNBALANCED
     if is_bijective(A, B):
         # Check whether the current mapping is already in the powerset
-        if len(X) == 0:
+        if X.istrivial():
             # Mapping is completely trivial
             return Case.IN_AUT
         # TODO check if X is already a member of the generating set
@@ -53,6 +53,7 @@ def gen_rec(A: "Graph",
         else:
             # If not in the generating set add it
             # TODO add the new mapping X to the generating set
+            G.append(X)
             return Case.NOT_IN_AUT
 
     c_classes = [
@@ -76,7 +77,8 @@ def gen_rec(A: "Graph",
         if u.label == v.label:
             resp = gen_rec(A, B, X=X, is_trivial=True, G=G)
         else:
-            X.append((v.label, u.label))
+            #X.append((v.label, u.label))
+            X = X.cycles().append([v.label, u.label])
             resp = gen_rec(A, B, X=X, is_trivial=False, G=G)
 
         if resp == Case.IN_AUT:
