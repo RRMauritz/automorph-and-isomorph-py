@@ -45,14 +45,14 @@ class permutation():
         if mapping != None:
             if testvalidity:
                 assert len(mapping) == n
-                #if len(mapping)!=n:
+                # if len(mapping)!=n:
                 #	raise permError
                 test = [0] * n
                 for val in mapping:
                     test[val] += 1
                     assert test[val] <= 1
-                    #if test[val]>1:
-                    #	raise permError
+            # if test[val]>1:
+            #	raise permError
             if safeInit:
                 self.P = mapping[:]  # safe
             else:
@@ -62,7 +62,7 @@ class permutation():
             for cycle in cycles:
                 for i in range(len(cycle)):
                     assert self.P[cycle[i]] == cycle[i]
-                    #if self.P[cycle[i]]!=cycle[i]:
+                    # if self.P[cycle[i]]!=cycle[i]:
                     #	raise permError
                     self.P[cycle[i]] = cycle[(i + 1) % len(cycle)]
         else:
@@ -70,12 +70,12 @@ class permutation():
 
     def cycles(self):
         """
-		Returns the cycles of the permutation.
-		
-		(Can be used to create a copy of the permutation: type:
-		  CopyOfP=permutation(P.n,cycles=P.cycles())
-		)
-		"""
+        Returns the cycles of the permutation.
+
+        (Can be used to create a copy of the permutation: type:
+          CopyOfP=permutation(P.n,cycles=P.cycles())
+        )
+        """
         C = []
         incyc = [0] * self.n
         for i in range(self.n):
@@ -93,19 +93,18 @@ class permutation():
 
     def __repr__(self):
         """
-		Returns a technical string representation of the permutation.
-		(Can be used to create copy of this object.)
-		"""
+        Returns a technical string representation of the permutation.
+        (Can be used to create copy of this object.)
+        """
         if UseReadableOutput:
             return str(self)
         else:
-            return 'permutation(' + str(self.n) + ',cycles=' + str(
-                self.cycles()) + ')'
+            return 'permutation(' + str(self.n) + ',cycles=' + str(self.cycles()) + ')'
 
     def __str__(self):
         """
-		Returns a nice string representation of the permutation, using cycle notation.
-		"""
+        Returns a nice string representation of the permutation, using cycle notation.
+        """
         C = self.cycles()
         s = ''
         for cycle in C:
@@ -119,16 +118,16 @@ class permutation():
 
     def __getitem__(self, key):
         """
-		Returns the image of element <key> under this permutation.
-		(<key> should be an integer from 0 to n-1.)
-		"""
+        Returns the image of element <key> under this permutation.
+        (<key> should be an integer from 0 to n-1.)
+        """
         return self.P[key]
 
     def __neg__(self):
         """
-		Returns the *inverse* of this permutation.
-		Usage: simply type -P, for a permutation object P.
-		"""
+        Returns the *inverse* of this permutation.
+        Usage: simply type -P, for a permutation object P.
+        """
         Q = [0] * self.n
         for i in range(self.n):
             Q[self.P[i]] = i
@@ -136,11 +135,11 @@ class permutation():
 
     def __mul__(self, other):
         """
-		Returns the *composition* of permutation <self> and permutation <other>.
-		Convention: <other> is applied first!
-		Usage: simply type P*Q to obtain the composition of P and Q. 
-		(Q is applied first.) 
-		"""
+        Returns the *composition* of permutation <self> and permutation <other>.
+        Convention: <other> is applied first!
+        Usage: simply type P*Q to obtain the composition of P and Q.
+        (Q is applied first.)
+        """
         if self.n != other.n:
             raise permError
         Q = [0] * self.n
@@ -150,9 +149,9 @@ class permutation():
 
     def __pow__(self, i):
         """
-		Returns the <i>-th power of the permutation.
-		Usage: simply type P**i.
-		"""
+        Returns the <i>-th power of the permutation.
+        Usage: simply type P**i.
+        """
         if i == 0:
             return permutation(self.n)
         if i < 0:
@@ -170,9 +169,9 @@ class permutation():
 
     def istrivial(self):
         """
-		Returns <True> iff the permutation is trivial, so if it maps
-		every element in 0...n-1 to itself.
-		"""
+        Returns <True> iff the permutation is trivial, so if it maps
+        every element in 0...n-1 to itself.
+        """
         for i in range(self.n):
             if self.P[i] != i:
                 return False
@@ -180,11 +179,11 @@ class permutation():
 
     def __eq__(self, other):
         """
-		Returns <True> iff permutation <self> equals permutation <other>, in the sense
-		that they represent the same mapping.
-		(May be different objects in memory.)
-		Usage: Type P==Q.
-		"""
+        Returns <True> iff permutation <self> equals permutation <other>, in the sense
+        that they represent the same mapping.
+        (May be different objects in memory.)
+        Usage: Type P==Q.
+        """
         if not hasattr(other, 'P'):
             return False
         for i in range(self.n):
