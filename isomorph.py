@@ -53,12 +53,14 @@ def colour_twins(A: "Graph", B: "Graph"):
 
 
 def membership_test(H: "list", f: "permutation"):
+    alpha = FindNonTrivialOrbit(H)
+    if alpha is None:
+        return False
     if f.istrivial():
         return True
-    alpha = FindNonTrivialOrbit(H)
     orbit, transversal = Orbit(H, alpha, True)
-    im = f.__getitem__(alpha)
-    u = next(v for v in transversal if v.__getitem__(alpha) == im)
+    beta = f.__getitem__(alpha)
+    u = [v for v in transversal if v.__getitem__(alpha) == beta][0]
     if u.istrivial():
         return False
     else:
@@ -79,6 +81,12 @@ def cardinality_generating_set(H: "list"):
         return length_orbit * cardinality_generating_set(stab)
     else:
         return 1
+
+
+def construct_genset(H: "list", f):
+    if not membership_test(H, f):
+        H.append(f)
+    return H
 
 
 def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
