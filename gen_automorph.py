@@ -31,19 +31,24 @@ class Case(Enum):
 # is_trivial shows whether the current step is trivial
 def gen_rec(A: "Graph",
             B: "Graph",
-            X: "permutation" = permutation(),
+            X: "permutation" = permutation(0, cycles=[]),
             is_trivial=False,
             G: "List" = []):
     # Do coloring
     U = A + B
     color_refinement(U, reset_colors=False)
     A, B = U.split_disjoint()
+    print("G", G)
+    print("X", X)
 
     if is_unbalanced(A, B):
+        print("Unbalanced")
         return Case.UNBALANCED
     if is_bijective(A, B):
+        print("Bijective")
         # Check whether the current mapping is already in the powerset
         if X.istrivial():
+            print("X is trivial")
             # Mapping is completely trivial
             return Case.IN_AUT
         # TODO check if X is already a member of the generating set
@@ -67,18 +72,30 @@ def gen_rec(A: "Graph",
     v.color = A.max_color + 1
     v.colornum = v.color
 
-    for u in [k for k in B.vertices if k.color == ref_c]:
+    for u in [k for k in B.vertices if k.color == c_class]:
         old_u_col = u.color
         u.color = v.color
         u.colornum = v.colornum
 
         resp = None
         old_x = X
+        print("{} {}".format(u.label, v.label))
+        n = sum([len(x) for x in X.cycles()])
+        if not v.label in [i for sl in X.cycles() for i in sl]:
+            n += 1
+        if not u.label in [i for sl in X.cycles() for i in sl]:
+            n += 1
+
+        # Update X
+        new_cycles = X.cycles()
+        new_cycles.append([v.label, u.label])
+        X = permutation(n, cycles=new_cycles)
+        print("New cycles: ", new_cycles)
+        print("After adding: ", X.cycles())
         if u.label == v.label:
             resp = gen_rec(A, B, X=X, is_trivial=True, G=G)
         else:
             #X.append((v.label, u.label))
-            X = X.cycles().append([v.label, u.label])
             resp = gen_rec(A, B, X=X, is_trivial=False, G=G)
 
         if resp == Case.IN_AUT:
@@ -112,7 +129,7 @@ def gen_auto_set(G: "Graph"):
         v.color = v.degree
 
     X = list()
-    gen_rec(G, G, X)
+    gen_rec(G, G, G=X)
     return X
 
 

@@ -31,7 +31,9 @@ def colour_twins(A: "Graph", B: "Graph"):
     twins_a = true_twins_a + false_twins_a
     for twina in twins_a:
         for twinb in true_twins_b + false_twins_b:
-            if [d.color for d in twina[0].neighbours] == [d.color for d in twinb[0].neighbours]:
+            if [d.color for d in twina[0].neighbours] == [
+                    d.color for d in twinb[0].neighbours
+            ]:
                 twina[0].color = A.max_color + 1
                 twinb[0].color = B.max_color + 1
                 break
@@ -49,7 +51,7 @@ def colour_twins(A: "Graph", B: "Graph"):
             res.add(twin[0])
             res.add(twin[1])
         print(res)
-        return 2 ** len(res)
+        return 2**len(res)
 
 
 def membership_test(H: "list", f: "permutation"):
@@ -60,7 +62,10 @@ def membership_test(H: "list", f: "permutation"):
         return True
     orbit, transversal = Orbit(H, alpha, True)
     beta = f.__getitem__(alpha)
-    u = [v for v in transversal if v.__getitem__(alpha) == beta][0]
+    u = [v for v in transversal if v.__getitem__(alpha) == beta]
+    if not u:
+        return False
+    u = u[0]
     if u.istrivial():
         return False
     else:

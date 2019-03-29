@@ -46,6 +46,7 @@ class Vertex(object):
         self._graph = graph
         self.label = label
         self._old_label = label
+        self.parent = 0
         self.color = 0
         self._incidence = {}
 
