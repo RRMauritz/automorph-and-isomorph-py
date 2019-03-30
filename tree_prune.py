@@ -4,8 +4,6 @@ from graph import *
 from fast_col_ref import color_refinement
 from isomorph import membership_test, cardinality_generating_set
 import sys
-from graph_io import *
-from random import randint
 
 
 class tree_node:
@@ -75,15 +73,60 @@ def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
         if root.is_trivial():
             return False
         else:
+            # Create set of all labels for which mappings exist
+            # By flattening the list and making it a set
+            is_mapped = set([x for sl in root.mapping for x in sl])
+            # Then check every label not in that set
+            # And add the mappings
+            for v in A.vertices:
+                if v in is_mapped:
+                    continue
+                u = next((x for x in B.vertices if x.color == v.color))
+                if (u.label, v.label) not in root.mapping and (
+                        v.label, u.label) not in root.mapping:
+                    root.mapping.append((v.label, u.label))
+
             # Create a list of untrivial mappings which are the cycles
-            cycles = [[c[0], c[1]] for c in root.mapping if c[0] != c[1]]
             # Create the permutation
+            cycles = list()
+            # This creates a cycle representation of the mapping
+            for c in [[c[0], c[1]] for c in root.mapping if c[0] != c[1]]:
+                if not cycles:
+                    cycles.append(c)
+                    continue
+                append = [x for x in cycles if x[-1] == c[0]]
+                prepend = [x for x in cycles if x[0] == c[-1]]
+
+                if append and prepend:
+                    append = append[0]
+                    prepend = prepend[0]
+                    if append == prepend:
+                        i = cycles.index(append)
+                        cycles[i] = append[:-1] + c[:-1]
+                    else:
+                        i = cycles.index(append)
+                        j = cycles.index(append)
+                        cycles[i] = append[:-1] + c[:-1] + prepend
+                        cycles.remove(prepend)
+                elif append:
+                    append = append[0]
+                    i = cycles.index(append)
+                    cycles[i] = append[:-1] + c
+                    if cycles[i][0] == cycles[i][-1]:
+                        cycles[i] = cycles[i][:-1]
+                elif prepend:
+                    prepend = prepend[0]
+                    j = cycles.index(prepend)
+                    cycles[j] = c[:-1] + prepend
+                    if cycles[j][0] == cycles[j][-1]:
+                        cycles[j] = cycles[j][:-1]
+                else:
+                    cycles.append(c)
+
             perm = permutation(len(A.vertices), cycles)
 
             # Test if the permutation is already a member
             if len(gen_set) == 0 or not membership_test(gen_set, perm):
-            # TODO replace random choice with membership_test when it works
-            #if randint(0, 1) < 0.5:
                 gen_set.append(perm)
                 # Return True which means return to the latest trivial node
                 return True
@@ -100,29 +143,35 @@ def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
     v = col_verts[0]
 
     v.color = A.max_color + 1
+    v.color_num = v.color
 
     for u in [k for k in B.vertices if k.color == ref_c_class]:
         old_u_color = u.color
         u.color = v.color
+        u.color_num = v.color_num
 
         new_mapping = root.mapping.copy()
         new_mapping.append((v.label, u.label))
         new_node = tree_node(root, mapping=new_mapping)
-        if create_level(new_node, A, B, gen_set) and not root.is_trivial():
+        if not ((u.label, v.label) in root.mapping or
+                (v.label, u.label) in root.mapping) and create_level(
+                    new_node, A, B, gen_set) and not root.is_trivial():
             return True
 
         # Add child
         root.add_child(new_node)
 
+        u.color_num = old_u_color
         u.color = old_u_color
 
     return False
 
 
-def count_isomorphs(graph: "Graph"):
+def count_automorphs(graph: "Graph"):
     # Create root of tree
     root = tree_node(None)
     gen_set = list()
+    color_refinement(graph)
     create_level(root, graph, graph, gen_set)
     return gen_set
 
@@ -131,6 +180,6 @@ if __name__ == "__main__":
     print("Counting automorphs")
     with open(sys.argv[1]) as f:
         G = load_graph(f, read_list=True)
-    gen_set = count_isomorphs(G[0][int(sys.argv[2])])
-    print("Gen_set: ", gen_set)
+    gen_set = count_automorphs(G[0][int(sys.argv[2])])
+    #print("Gen_set: ", gen_set)
     print("Automorphs: ", cardinality_generating_set(gen_set))

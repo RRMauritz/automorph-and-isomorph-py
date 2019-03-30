@@ -41,16 +41,12 @@ def colour_twins(A: "Graph", B: "Graph"):
                 continue
         continue
     res = set()
-    print("A is connected: ", A.is_connected())
     if A.is_connected():
-        print("Im connected!")
         return factorial(len(twins_a))
     else:
-        print("Im not connected!")
         for twin in twins_a:
             res.add(twin[0])
             res.add(twin[1])
-        print(res)
         return 2**len(res)
 
 
@@ -174,7 +170,6 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
         # Change color back so another vertex can get colored
         u.color = old_u_color
         u.colornum = old_u_color
-    print("Num: ", num, "twin_count: ", twin_count)
     return num * twin_count
 
 
