@@ -4,6 +4,7 @@ from graph import *
 from fast_col_ref import color_refinement
 from isomorph import membership_test, cardinality_generating_set
 import sys
+from graph_io import load_graph
 
 
 class tree_node:
