@@ -4,7 +4,7 @@ from graph import *
 from fast_col_ref import color_refinement
 from isomorph import membership_test, cardinality_generating_set
 import sys
-from graph_io import load_graph
+from graph_io import load_graph, write_dot
 
 
 def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
@@ -110,12 +110,14 @@ def cycles_from_mapping(mapping: "List"):
     return cycles
 
 
-def count_automorphs(graph: "Graph"):
+def count_automorphs(graph: "Graph", dot_tree=False):
     # Create root of tree
     root = tree_node(None)
     gen_set = list()
     color_refinement(graph)
     create_level(root, graph, graph, gen_set)
+    if dot_tree:
+        root.print_tree()
     return gen_set
 
 
@@ -161,23 +163,45 @@ class tree_node:
     def __str__(self):
         if self.level == 0:
             return "[Root of Tree]"
-        return "{}{}".format("\t" * (self.level - 1), self.mapping)
+        reduced_m = [m for m in self.mapping if m[0] != m[1]]
+        if reduced_m:
+            return "{}".format(reduced_m)
+
+        else:
+            return "trivial"
 
     def print_tree(self):
-        S = deque()
-        S.append(self)
+        verts = dict()
+        edges = list()
 
-        while S:
-            v = S.pop()
-            print(v)
-            for w in v.children:
-                S.append(w)
+        # Recursive sub function for printing
+        def rec_print_tree(node: "tree_node", v: "Dict", e: "List", i=[0]):
+            v[node] = i[0]
+
+            for c in node.children:
+                i[0] += 1
+                rec_print_tree(c, v, e, i)
+                e.append([v[node], v[c]])
+
+        rec_print_tree(self, verts, edges)
+
+        G = Graph(directed=False)
+        vertices = {i: Vertex(G, label=v.__str__()) for v, i in verts.items()}
+        for v in vertices.values():
+            G.add_vertex(v)
+
+        for e in edges:
+            G.add_edge(Edge(vertices[e[0]], vertices[e[1]]))
+
+        with open('colored.dot', 'w') as f:
+            write_dot(G, f)
+            print("Wrote tree to 'colored.dot'")
 
 
 if __name__ == "__main__":
     print("Counting automorphs")
     with open(sys.argv[1]) as f:
         G = load_graph(f, read_list=True)
-    gen_set = count_automorphs(G[0][int(sys.argv[2])])
+    gen_set = count_automorphs(G[0][int(sys.argv[2])], dot_tree=True)
     #print("Gen_set: ", gen_set)
     print("Automorphs: ", cardinality_generating_set(gen_set))
