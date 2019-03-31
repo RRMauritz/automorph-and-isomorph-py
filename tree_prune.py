@@ -202,6 +202,7 @@ if __name__ == "__main__":
     print("Counting automorphs")
     with open(sys.argv[1]) as f:
         G = load_graph(f, read_list=True)
-    gen_set = count_automorphs(G[0][int(sys.argv[2])], dot_tree=True)
+    gen_set = count_automorphs(
+        G[0][int(sys.argv[2])], dot_tree=(len(sys.argv) > 3))
     #print("Gen_set: ", gen_set)
     print("Automorphs: ", cardinality_generating_set(gen_set))
