@@ -38,13 +38,18 @@ def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
                 gen_set.append(perm)
                 # Return True which means return to the latest trivial node
                 return True
-            return False
+            # If true, return
+            # If automorph found that is already in the set still return to
+            # trivial node instead of continuing
+            # Otherwise use false
+            return True
 
     c_classes = [
         c for c, n in Counter([v.color for v in A.vertices]).items() if n >= 2
     ]
 
-    ref_c_class = max(c_classes)
+    ref_c_class = max(
+        c_classes, key=lambda c: len([v for v in A.vertices if v.color == c]))
 
     col_verts = [v for v in A.vertices if v.color == ref_c_class]
 
@@ -162,7 +167,7 @@ class tree_node:
 
     def __str__(self):
         if self.level == 0:
-            return "[Root of Tree]"
+            return "[Root]"
         reduced_m = [m for m in self.mapping if m[0] != m[1]]
         if reduced_m:
             return "{}".format(reduced_m)
@@ -202,6 +207,7 @@ if __name__ == "__main__":
     print("Counting automorphs")
     with open(sys.argv[1]) as f:
         G = load_graph(f, read_list=True)
+    #sys.setrecursionlimit(10000)
     gen_set = count_automorphs(
         G[0][int(sys.argv[2])], dot_tree=(len(sys.argv) > 3))
     #print("Gen_set: ", gen_set)
