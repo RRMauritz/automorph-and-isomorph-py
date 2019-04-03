@@ -5,9 +5,10 @@ This is a module for working with directed and undirected multigraphs.
 # version: 01-02-2017, Pieter Bos, Tariq Bontekoe
 
 from typing import List, Union, Set
+from math import inf
+from collections import deque
 import itertools as it
 import copy as cp
-import heapq as queue
 
 
 class GraphError(Exception):
@@ -312,9 +313,9 @@ class Graph(object):
         """
         return len(self._v)
 
-    def is_connected(self):
+    def is_complete(self):
         verts = len(self.vertices)
-        return len(self.edges) == (verts*(verts-1))//2
+        return len(self.edges) == (verts * (verts - 1)) // 2
 
     def add_vertex(self, vertex: "Vertex"):
         """
@@ -327,10 +328,11 @@ class Graph(object):
 
         self._v.append(vertex)
 
-    def twins(self): #TODO: improve exact vs coloured neighbourhood --> apply after colour refinement once
+    def twins(self):
         """"
         This algorithm checks for the twin-sets in the graph.
         Complexity: O(n^2), where n is the number of vertices
+        :returns list of twin-pairs (true or false twins)
         """
         checked_vertices = list()
         passed = list()
@@ -351,17 +353,18 @@ class Graph(object):
     def twins2(self):
         """
         Twins seems faster than twins2, assumption lies in looplist creation.
-        Can this be improved (TODO?)
-        Assumes colour refinement has been applied. This is a hard req
-        :return:
+        Can this be improved (TODO)
+        !!Assumes colour refinement has been applied once!!
+        This method is a speed-up from the other twins-method because it only compares those vertices which have the same colour (degree)
+        :returns a list of twin-pairs
         """
         res = list()
         looplist = dict()
         for x in self.vertices:
-            if looplist.get(x.color):
-                looplist[x.color].append(x)
+            if looplist.get(x.color):  # if key x.color already exists
+                looplist[x.color].append(x)  # add vertex x to the list corresponding to this particular key (colour)
             else:
-                looplist[x.color] = list()
+                looplist[x.color] = list()  # if the key x.color doesn't exist yet
                 looplist[x.color].append(x)
         for k in looplist.keys():
             dd = list()
@@ -375,7 +378,6 @@ class Graph(object):
                         if d.twins(ddd):
                             res.append((d, ddd))
         return res
-
 
     def del_vertex(self, vertex: "Vertex"):
         """
@@ -450,6 +452,13 @@ class Graph(object):
             res.add_vertex(v)
         for e in temp.edges:
             res.add_edge(e)
+        return res
+
+    def induced_subgraph(self, vertices):
+        res = cp.copy(self)
+        for v in self.vertices:
+            if v not in vertices:
+                res.del_vertex(v)
         return res
 
     def create_dsu(self, graphs: 'list'):
@@ -550,25 +559,71 @@ class Graph(object):
 
         return False
 
-    def is_tree(self):
-        # Mark all the vertices as not visited
-        # and not part of recursion stack
-        visited = {}
-        # The call to isCyclicUtil serves multiple
-        # purposes. It returns true if graph reachable
-        # from vertex 0 is cyclcic. It also marks
-        # all vertices reachable from 0.
-        if self._isCyclicUtil(self.vertices[0], visited, None):
+    def graph_search(self, s: "Vertex"):
+        """"
+        Apply Breadth-first search to the graph
+        :returns label, parent and shortest distance from source to any v in the graph
+        """
+        k = 1
+        flag = {}
+        pred = {}
+        label = {}
+        d = {}
+        for v in self.vertices:
+            flag[v] = False
+            pred[v] = -1
+            d[v] = inf
+        Q = deque()
+        flag[s] = True
+        d[s] = 0
+        label[s] = k
+        Q.append(s)
+
+        while Q:
+            v = Q.popleft()
+            for w in v.neighbours:
+                if flag[w] == False:
+                    flag[w] = True
+                    pred[w] = v
+                    k += 1
+                    label[w] = k
+                    d[w] = d[v] + 1
+                    Q.append(w)
+
+        return label, pred, d
+
+    @property
+    def is_connected(self):
+        label, parent, dist = self.graph_search(self.vertices[0])
+        if self.__len__() != max(label.values()):
             return False
-
-        # If we find a vertex which is not reachable
-        # from 0 (not marked by isCyclicUtil(),
-        # then we return false
-        for i in self.vertices:
-            if visited[i] == False:
-                return False
-
         return True
+
+    @property
+    def is_tree(self):
+        if self.is_connected and len(self.edges) == self.__len__() - 1:
+            return True
+        return False
+
+    def find_center(self):  # TODO: test if diag is odd number
+        root = self.vertices[0]  # take 'random' root
+        label1, parent1, d1 = self.graph_search(root)
+        v1 = max(d1, key=d1.get)
+        label2, parent2, d2 = self.graph_search(v1)
+        v2 = max(d2, key=d2.get)
+        diam = d2[v2]  # the length of the path from v1 to v2
+        k = 0
+        child = v2
+        if diam % 2 == 0:
+            mid = diam / 2
+        else:
+            mid = ((diam - 1) / 2) + 1
+        while k != mid:
+            parent = parent2[child]
+            child = parent
+            k += 1
+        # print("root:", root, "v1:", v1, "v2:", v2, "mid:", mid)
+        return child
 
     @property
     def max_color(self) -> int:
