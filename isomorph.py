@@ -107,8 +107,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
         z2 = [v for v in dy.keys() if dy[v] == ly]
         level_vertsX[lx] = z1  # dictionary with key = level, value = list of vertices
         level_vertsY[ly] = z2
-        print("X:Level:", lx, ":", len(level_vertsX[lx]))
-        print("Y:Level:", ly, ":", len(level_vertsY[ly]))
+        # print("X:Level:", lx, ":", len(level_vertsX[lx]))
+        # print("Y:Level:", ly, ":", len(level_vertsY[ly]))
         # if len(z1) != len(z2):
         #     return False
 
