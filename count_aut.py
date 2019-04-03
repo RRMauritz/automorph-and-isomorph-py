@@ -2,9 +2,8 @@ from permv2 import *
 from collections import deque, Counter
 from graph_adj import *
 from fast_col_ref import color_refinement
-from isomorph import membership_test, cardinality_generating_set
 from graph_io_adj import load_graph_list
-from graph_lib import is_unbalanced, is_bijective, cycles_from_mapping
+from graph_lib import is_unbalanced, is_bijective, cycles_from_mapping, membership_test, cardinality_generating_set
 from sys import setrecursionlimit, argv
 
 
