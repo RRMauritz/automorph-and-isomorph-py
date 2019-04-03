@@ -1,5 +1,13 @@
 from typing import List
 from copy import deepcopy
+from enum import Enum
+
+
+class Twin(Enum):
+    none = 0
+    false = 1
+    true = 2
+
 
 class Edge:
     def __init__(self, head: "int", tail: "int"):
@@ -13,7 +21,7 @@ class Vertex:
         self._graph = graph
 
     def is_adjacent(self, other: "Vertex") -> bool:
-        return G.is_adjacent(self, other)
+        return self._graph.is_adjacent(self, other)
 
     @property
     def neighbors(self) -> List["Vertex"]:
@@ -33,6 +41,24 @@ class Vertex:
 
     def change_color(self, c):
         self._graph.colors[self.index] = c
+
+    def twins(self, other: "Vertex"):
+        nb1 = {v.index for v in self.neighbors}
+        nb2 = {v.index for v in other.neighbors}
+
+        if self.is_adjacent(other):
+            nb1.remove(other.index)
+            nb2.remove(self.index)
+
+            if nb1 == nb2:
+                return Twin.true
+            else:
+                return Twin.none
+        else:
+            if nb1 == nb2:
+                return Twin.false
+            else:
+                return Twin.none
 
 
 class Graph:
@@ -121,3 +147,26 @@ class Graph:
     @property
     def max_color(self):
         return max(self.colors)
+
+    def twins(self):
+        checked_verts = list()
+        passed = list()
+        true_twins = list()
+        false_twins = list()
+
+        for v in self.vertices:
+            passed.append(v)
+            for u in [d for d in self.vertices if d not in passed]:
+                check = v.twins(u)
+                if check == Twin.true:
+                    true_twins.append((u, v))
+                elif check == Twin.false:
+                    false_twins.append((u, v))
+
+        return true_twins, false_twins
+
+    def degree_of_color(self, b):
+        for i, c in enumerate(self.colors):
+            if c == b:
+                return self.vertices[i].degree
+        return 0
