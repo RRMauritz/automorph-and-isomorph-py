@@ -79,7 +79,7 @@ class Graph:
         new = Graph(self.size)
         new.dsu = True
         new.abs_size = new.size + other.size
-        new.adj_matrix = deepcopy(self.adj_matrix)
+        new.adj_matrix = self.adj_matrix.copy()
         new.colors = self.colors.copy()
         new.colors.extend(other.colors)
 
