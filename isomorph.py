@@ -1,6 +1,6 @@
 from math import factorial
-from graph import *
-from graph_io import *
+from graph_adj import *
+from graph_io_adj import *
 from collections import Counter
 from fast_col_ref import color_refinement
 import sys

@@ -1,6 +1,6 @@
 import time
 from isomorph import *
-from graph_io import *
+from graph_io_adj import *
 from permv2 import *
 from fast_col_ref import color_refinement
 import sys
@@ -27,8 +27,9 @@ import sys
 #print(membership_test(gen_set, f))
 
 with open(sys.argv[1]) as f:
-    G = load_graph(f, read_list=True)
-G = G[0][int(sys.argv[2])]
-color_refinement(G)
+    G = load_graph_list(f)
+G = G[int(sys.argv[2])]
+U = G + G
+color_refinement(U)
 with open('colored.dot', 'w') as f:
-     write_dot(G, f)
+     write_dot(U, f)

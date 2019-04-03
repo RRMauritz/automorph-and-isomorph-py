@@ -1,4 +1,4 @@
-from graph import *
+from graph_adj import *
 from collections import deque
 
 
@@ -12,13 +12,13 @@ def color_refinement(G: "Graph", reset_colors=True):
             key = v.color
 
         if key in color_classes.keys():
-            color_classes[key].add(v.label)
+            color_classes[key].add(v.index)
         else:
-            color_classes[key] = set([v.label])
+            color_classes[key] = set([v.index])
 
     # The set of neighbors for every vertice
     neighbors = {
-        v.label: set([t.label for t in v.neighbours])
+        v.index: set([t.index for t in v.neighbors])
         for v in G.vertices
     }
 
@@ -81,8 +81,7 @@ def color_refinement(G: "Graph", reset_colors=True):
         color_stack.remove(color_class)
 
     # Map label to vertice for easy color assignment
-    verts = {v.label: v for v in G.vertices}
+    verts = {v.index: v for v in G.vertices}
     for c, vs in color_classes.items():
         for v in vs:
-            verts[v].colornum = c
-            verts[v].color = c
+            verts[v].change_color(c)

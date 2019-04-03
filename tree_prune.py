@@ -1,10 +1,10 @@
 from permv2 import *
 from collections import deque, Counter
-from graph import *
+from graph_adj import *
 from fast_col_ref import color_refinement
 from isomorph import membership_test, cardinality_generating_set
 import sys
-from graph_io import load_graph, write_dot
+from graph_io_adj import load_graph_list
 
 
 def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
@@ -25,13 +25,13 @@ def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
                 if v in is_mapped:
                     continue
                 u = next((x for x in B.vertices if x.color == v.color))
-                if (u.label, v.label) not in root.mapping and (
-                        v.label, u.label) not in root.mapping:
-                    root.mapping.append((v.label, u.label))
+                if (u.index, v.index) not in root.mapping and (
+                        v.index, u.index) not in root.mapping:
+                    root.mapping.append((v.index, u.index))
 
             # Generate cycles and permutation from current mapping
             cycles = cycles_from_mapping(root.mapping)
-            perm = permutation(len(A.vertices), cycles)
+            perm = permutation(A.size, cycles)
 
             # Test if the permutation is already a member
             if len(gen_set) == 0 or not membership_test(gen_set, perm):
@@ -55,16 +55,14 @@ def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
 
     v = col_verts[0]
 
-    v.color = A.max_color + 1
-    v.color_num = v.color
+    v.change_color(A.max_color + 1)
 
     for u in [k for k in B.vertices if k.color == ref_c_class]:
         old_u_color = u.color
-        u.color = v.color
-        u.color_num = v.color_num
+        u.change_color(v.color)
 
         new_mapping = root.mapping.copy()
-        new_mapping.append((v.label, u.label))
+        new_mapping.append((v.index, u.index))
         new_node = tree_node(root, mapping=new_mapping)
         if create_level(new_node, A, B, gen_set) and not root.is_trivial():
             return True
@@ -72,8 +70,7 @@ def create_level(root: "tree_node", A: "Graph", B: "Graph", gen_set: "List"):
         # Add child
         root.add_child(new_node)
 
-        u.color_num = old_u_color
-        u.color = old_u_color
+        u.change_color(old_u_color)
 
     return False
 
@@ -127,15 +124,13 @@ def count_automorphs(graph: "Graph", dot_tree=False):
 
 
 def is_unbalanced(A, B):
-    a = Counter([v.color for v in A.vertices])
-    b = Counter([v.color for v in B.vertices])
-    return not a == b
+    return not sorted(A.colors) == sorted(B.colors)
 
 
 def is_bijective(A, B):
-    a = Counter([v.color for v in A.vertices])
-    b = Counter([v.color for v in B.vertices])
-    return a == b and len(a) == len(A.vertices) and len(b) == len(B.vertices)
+    a = sorted(A.colors)
+    b = sorted(B.colors)
+    return a == b and len(set(a)) == A.size and len(set(b)) == B.size
 
 
 class tree_node:
@@ -204,11 +199,11 @@ class tree_node:
 
 
 if __name__ == "__main__":
-    print("Counting automorphs")
+    #print("Counting automorphs")
     with open(sys.argv[1]) as f:
-        G = load_graph(f, read_list=True)
+        G = load_graph_list(f)
     #sys.setrecursionlimit(10000)
     gen_set = count_automorphs(
-        G[0][int(sys.argv[2])], dot_tree=(len(sys.argv) > 3))
+        G[int(sys.argv[2])], dot_tree=(len(sys.argv) > 3))
     #print("Gen_set: ", gen_set)
     print("Automorphs: ", cardinality_generating_set(gen_set))
