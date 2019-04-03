@@ -89,53 +89,90 @@ def cardinality_generating_set(H: "list"):
         return 1
 
 
-def AHU(X: "Graph", Y: "Graph"):
-    labelx, parentx, dx = X.graph_search(X.find_center())
-    labely, parenty, dy = Y.graph_search(Y.find_center())
+def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
+    _, _, dx = X.graph_search(centerx)
+    _, _, dy = Y.graph_search(centery)
     level_vertsX = {}
     level_vertsY = {}
-    label1 = {}
-    label2 = {}
+    labelx = {}
+    labely = {}
     canonx = {}  # canonical representation of vertices at each level in X
     canony = {}  # canonical representation of vertices at each level in Y
-    for lx, ly in zip(dx.values(), dy.values()):
+
+    max_levelX = max(dx.values())
+    max_levelY = max(dy.values())
+
+    for lx, ly in zip(range(0, max_levelX + 1), range(0, max_levelY + 1)):
         z1 = [v for v in dx.keys() if dx[v] == lx]
         z2 = [v for v in dy.keys() if dy[v] == ly]
         level_vertsX[lx] = z1  # dictionary with key = level, value = list of vertices
         level_vertsY[ly] = z2
-
-    max_levelX = max(level_vertsX.keys())
-    max_levelY = max(level_vertsY.keys())
+        print("X:Level:", lx, ":", len(level_vertsX[lx]))
+        print("Y:Level:", ly, ":", len(level_vertsY[ly]))
+        # if len(z1) != len(z2):
+        #     return False
 
     # Initialize canonical notation on the leaves:
     if max_levelX != max_levelY:
         return False
-    else:
-        if len(level_vertsX[max_levelX]) != len(level_vertsY[max_levelY]):
-            return False
-        else:  # assign 1's to all the leaves
-            for v1, v2 in zip(level_vertsX[max_levelX], level_vertsY[max_levelY]):
-                label1[v1] = 1  # TODO: we now directly acces the label property of the graph, other way of doing this?
-                label2[v2] = 1
-    for l1, l2 in zip(range(max_levelX - 1, -1, -1), range(max_levelY - 1, -1, -1)):
-        for v1, v2 in zip(level_vertsX[l1], level_vertsY[l2]):
-            # iterate over the children:
-            label1[v1] = [label1[c] for c in level_vertsX[l1 + 1] if
-                          v1.is_adjacent(c)]  # list of the labels of the children
-            label2[v2] = [label2[c] for c in level_vertsY[l2 + 1] if
-                          v2.is_adjacent(c)]  # list of the labels of the children
-        canonx[l1] = [label1[v] for v in level_vertsX[l1]]  # canonical representation for the layer
-        canony[l2] = [label2[v] for v in level_vertsY[l2]]  # canonical representation for the layer
 
-        if canonx[l1].sort() == canony[l2].sort():
-            for v3, v4 in zip(level_vertsX[l1], level_vertsY[l2]):
-                label1[v3] = sum(label1[v3])
-                label2[v4] = sum(label2[v4])
-                #print(label1[v3], label2[v4])
+    leavesx = [v for v in X.vertices if v.degree == 1]
+    leavesy = [v for v in Y.vertices if v.degree == 1]
+    if len(leavesy) != len(leavesx):
+        return False
+    for vx, vy in zip(leavesx, leavesy):
+        labelx[vx] = 1
+        labely[vy] = 1
+
+    for lx, ly in zip(range(max_levelX - 1, -1, -1), range(max_levelY - 1, -1, -1)):
+        for vx, vy in zip(level_vertsX[lx], level_vertsY[ly]):
+            # iterate over the children:
+            if vx.degree > 1:
+                labelx[vx] = [labelx[c] for c in level_vertsX[lx + 1] if
+                              vx.is_adjacent(c)]  # list of the labels of the children
+            if vy.degree > 1:
+                labely[vy] = [labely[c] for c in level_vertsY[ly + 1] if
+                              vy.is_adjacent(c)]  # list of the labels of the children
+
+        canonx[lx] = [labelx[v] for v in level_vertsX[lx]]  # canonical representation for the layer
+        canony[ly] = [labely[v] for v in level_vertsY[ly]]  # canonical representation for the layer
+        i = 0
+        for x, y in zip(canonx[lx], canony[ly]):
+            if isinstance(x, list):
+                x.sort()  # sort the label of a vertex
+                temp = ""
+                for el in x:
+                    temp += str(el)
+                canonx[lx][i] = int(temp)
+            if isinstance(y, list):
+                y.sort()
+                temp = ""
+                for el in y:
+                    temp += str(el)
+                canony[ly][i] = int(temp)  # we should also change the label of the corresponding vertex
+            i += 1
+
+        if sorted(canonx[lx]) == sorted(canony[ly]):
+            for v3, v4 in zip(level_vertsX[lx], level_vertsY[ly]):
+                if isinstance(labelx[v3], list):
+                    labelx[v3] = sum(labelx[v3])  # TODO: is this legal?
+                if isinstance(labely[v4], list):
+                    labely[v4] = sum(labely[v4])
+
         else:
             return False
-    if label1[X.find_center()] == label2[Y.find_center()]:
+
+    if labelx[centerx] == labely[centery]:
         return True
+    else:
+        return False
+
+
+def tree_isomorphism(X: "Graph", centerx, Y: "Graph", centery):
+    if len(centerx) == 1 and len(centery) == 1:
+        return AHU(X, centerx[0], Y, centery[0])
+    elif len(centerx) == 2 and len(centery) == 2:
+        return AHU(X, centerx[0], Y, centery[0]) or AHU(X, centerx[1], Y, centery[0])
     else:
         return False
 
@@ -228,7 +265,6 @@ def count_isomorphisms(X: "Graph", Y: "Graph", count_isomorphs=True):
         u.colornum = old_u_color
     # print("Num: ", num, "twin_count: ", twin_count)
     return num  # *twin_count
-
 
 # if len(sys.argv) > 3:
 #     with open(sys.argv[1]) as f:

@@ -605,25 +605,30 @@ class Graph(object):
             return True
         return False
 
-    def find_center(self):  # TODO: test if diag is odd number
+    def find_center(self):  # TODO: test if diam is odd number
         root = self.vertices[0]  # take 'random' root
-        label1, parent1, d1 = self.graph_search(root)
+        _, _, d1 = self.graph_search(root)
         v1 = max(d1, key=d1.get)
-        label2, parent2, d2 = self.graph_search(v1)
+        _, parent2, d2 = self.graph_search(
+            v1)  # parent2 stores all the parents when we go from v1 to all the other vertices
         v2 = max(d2, key=d2.get)
         diam = d2[v2]  # the length of the path from v1 to v2
         k = 0
         child = v2
         if diam % 2 == 0:
             mid = diam / 2
+            while k != mid:
+                parent = parent2[child]
+                child = parent
+                k += 1
+            return [child]
         else:
-            mid = ((diam - 1) / 2) + 1
-        while k != mid:
-            parent = parent2[child]
-            child = parent
-            k += 1
-        # print("root:", root, "v1:", v1, "v2:", v2, "mid:", mid)
-        return child
+            mid = ((diam - 1) / 2)
+            while k != mid:
+                parent = parent2[child]
+                child = parent
+                k += 1
+            return [child, parent2[child]]
 
     @property
     def max_color(self) -> int:
