@@ -30,10 +30,10 @@ def count_aut_rec(A: "Graph",
                 if v in is_mapped:
                     continue
                 u = next((x for x in B.vertices if x.color == v.color))
-                if (u.index,
-                        v.index) not in mapping and (v.index,
-                                                     u.index) not in mapping:
-                    mapping.append((v.index, u.index))
+                if (u.i,
+                        v.i) not in mapping and (v.i,
+                                                     u.i) not in mapping:
+                    mapping.append((v.i, u.i))
 
             # Generate cycles and permutation from current mapping
             cycles = cycles_from_mapping(mapping)
@@ -68,9 +68,9 @@ def count_aut_rec(A: "Graph",
         u.change_color(v.color)
 
         new_mapping = mapping.copy()
-        new_mapping.append((v.index, u.index))
+        new_mapping.append((v.i, u.i))
         trivial = False
-        if v.index == u.index and is_trivial:
+        if v.i == u.i and is_trivial:
             trivial = True
         if count_aut_rec(A, B, gen_set, new_mapping,
                          trivial) and not is_trivial:

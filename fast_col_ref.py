@@ -12,15 +12,12 @@ def color_refinement(G: "Graph", reset_colors=True):
             key = v.color
 
         if key in color_classes.keys():
-            color_classes[key].add(v.index)
+            color_classes[key].add(v.i)
         else:
-            color_classes[key] = set([v.index])
+            color_classes[key] = set([v.i])
 
     # The set of neighbors for every vertice
-    neighbors = {
-        v.index: set([t.index for t in v.neighbors])
-        for v in G.vertices
-    }
+    neighbors = {v.i: set([t.i for t in v.neighbors]) for v in G.vertices}
 
     #TODO color_classes going from 0 to n
 
@@ -81,7 +78,7 @@ def color_refinement(G: "Graph", reset_colors=True):
         color_stack.remove(color_class)
 
     # Map label to vertice for easy color assignment
-    verts = {v.index: v for v in G.vertices}
+    verts = {v.i: v for v in G.vertices}
     for c, vs in color_classes.items():
         for v in vs:
             verts[v].change_color(c)
