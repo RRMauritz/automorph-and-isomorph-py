@@ -68,12 +68,13 @@ class Graph:
         self.size = n
         self.abs_size = n
         # Init matrix
-        self.adj_matrix = [[]] * self.size
+        self.adj_matrix = [[] for _ in range(self.size)]
         for i in range(self.size):
             self.adj_matrix[i] = [False] * self.size
 
         self.colors = [0] * self.size
         self.dsu = False
+        self.neighbors = [[] for _ in range(self.size)]
 
     @property
     def vertices(self) -> List["Vertex"]:
@@ -98,6 +99,8 @@ class Graph:
 
         self.adj_matrix[edge.head][edge.tail] = True
         self.adj_matrix[edge.tail][edge.head] = True
+        self.neighbors[edge.head].append(edge.tail)
+        self.neighbors[edge.tail].append(edge.head)
 
     def __add__(self, other: "Graph") -> "Graph":
         if self.dsu:
@@ -109,6 +112,8 @@ class Graph:
         new.adj_matrix = self.adj_matrix.copy()
         new.colors = self.colors.copy()
         new.colors.extend(other.colors)
+        new.neighbors = self.neighbors.copy()
+        new.neighbors.extend([[] for _ in range(other.size)])
 
         for _ in range(other.size):
             new.adj_matrix.append([False] * new.size)
@@ -130,6 +135,9 @@ class Graph:
 
         A.colors = self.colors[:self.size]
         B.colors = self.colors[self.size:]
+
+        A.neighbors = self.neighbors[:self.size]
+        B.neighbors = self.neighbors[self.size:]
 
         for i, c in enumerate(self.adj_matrix[:self.size]):
             A.adj_matrix[i] = c[:self.size]
@@ -171,7 +179,6 @@ class Graph:
             if c == b:
                 return self.vertices[i].degree
         return 0
-
 
     # TODO test everything here
     def graph_search(self, s: "Vertex"):

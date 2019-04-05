@@ -16,8 +16,6 @@ def color_refinement(G: "Graph", reset_colors=True):
         else:
             color_classes[key] = set([v.i])
 
-    # The set of neighbors for every vertice
-    neighbors = {v.i: set([t.i for t in v.neighbors]) for v in G.vertices}
 
     #TODO color_classes going from 0 to n
 
@@ -42,7 +40,7 @@ def color_refinement(G: "Graph", reset_colors=True):
             # The D_n's for this color class cc
             D = [False] * (n + 1)
             for v in verts:
-                nb = set(neighbors[v])
+                nb = set(G.neighbors[v])
                 nb = nb.intersection(split_set)
                 i = len(nb)
                 if not D[i]:
@@ -50,11 +48,13 @@ def color_refinement(G: "Graph", reset_colors=True):
                 D[i].add(v)
 
             # Clean up empty sets
-            D = [d for d in D if d]
+            #D = [d for d in D if d]
 
             # Split up cc into subpartitions from D
             first_iter = True
             for d in D:
+                if not d:
+                    continue
                 if first_iter:
                     color_classes[cc] = d
                     first_iter = False
