@@ -6,9 +6,9 @@ def color_refinement(G: "Graph", reset_colors=True):
     # Assign colormap: Color -> [Vertices]
     color_classes = {}
     for v in G.vertices:
-        key = v.degree
-        #key = 0
-        if not reset_colors:
+        if reset_colors:
+            key = v.degree
+        else:
             key = v.color
 
         if key in color_classes.keys():

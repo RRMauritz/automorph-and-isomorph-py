@@ -9,11 +9,11 @@ Remark: composition / multiplication is reversed compared to the earlier version
 # permv2: based on permv2SOL / perm2
 # Paul Bonsma, 18-03-2015.
 
-testvalidity = True
+testvalidity = False
 # Check whether permutations are initialized correctly
 # (Whether they are bijections to 0..n-1, etc).
 # Set to <False> for slightly faster, but possibly error prone initialization.
-safeInit = True
+safeInit = False
 # If <True>, then permutations are initialized safely, avoiding "shared reference"
 # errors. Set to <False> for slightly faster, but possibly error prone initialization.
 UseReadableOutput = True
@@ -61,7 +61,8 @@ class permutation():
             self.P = [i for i in range(n)]
             for cycle in cycles:
                 for i in range(len(cycle)):
-                    assert self.P[cycle[i]] == cycle[i]
+                    if testvalidity:
+                        assert self.P[cycle[i]] == cycle[i]
                     # if self.P[cycle[i]]!=cycle[i]:
                     #	raise permError
                     self.P[cycle[i]] = cycle[(i + 1) % len(cycle)]
