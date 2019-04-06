@@ -61,6 +61,9 @@ class Vertex:
             else:
                 return Twin.none
 
+    def __eq__(self, other: "Vertex"):
+        return self.i == other.i and self._graph == other._graph
+
 
 class Graph:
     def __init__(self, n: "int" = 0):
@@ -240,3 +243,47 @@ class Graph:
                 child = parent
                 k += 1
             return [self.vertices[child], self.vertices[parent2[child]]]
+
+    def induced_subgraph(self, verts: "List"):
+        subgraph = Graph(len(verts))
+        indices = [k.i for k in verts]
+
+        for i, v in enumerate(indices):
+            nb = set(self.neighbors[v]).intersection(indices)
+            subgraph.colors[i] = self.colors[v]
+            for n in nb:
+                subgraph.add_edge(Edge(i, indices.index(n)))
+
+        return subgraph
+
+    def induced_subtree(self, root: "Vertex", parent: "Vertex"):
+        verts = set()
+        verts.add(root.i)
+        s = list()
+        s.append(root)
+        while s:
+            v = s.pop()
+            for n in v.neighbors:
+                if n == parent:
+                    continue
+                if not n.i in verts:
+                    verts.add(n.i)
+                    s.append(n)
+
+        subtree = self.induced_subgraph([Vertex(self, v) for v in verts])
+        return subtree
+
+
+# Test function
+if __name__ == "__main__":
+    from graph_io_adj import write_dot, load_graph_list
+    import sys
+    from fast_col_ref import color_refinement
+    with open(sys.argv[1]) as f:
+        G = load_graph_list(f)[int(sys.argv[2])]
+
+    color_refinement(G)
+    B = G.induced_subtree(G.vertices[4], G.vertices[5])
+
+    with open("colored.dot", "w") as f:
+        write_dot(G + B, f)

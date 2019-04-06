@@ -74,12 +74,11 @@ def write_dot(graph: Graph, f: IO[str]):
         options += 'color=' + str(col % NUM_COLORS +
                                   1) + ', colorscheme=' + DEFAULT_COLOR_SCHEME
 
-        f.write(str(v.index) + ' [' + options + ']\n')
+        f.write(str(v.i) + ' [' + options + ']\n')
     f.write('\n')
 
     for e in graph.edges:
         options = 'penwidth=2'
-        print(e.head, e.tail)
         f.write(
             str(e.tail) + ' -- ' + str(e.head) + ' [' + options + ']' + '\n')
 
