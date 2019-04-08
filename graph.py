@@ -454,11 +454,12 @@ class Graph(object):
             res.add_edge(e)
         return res
 
-    def induced_subgraph(self, vertices):
-        res = cp.copy(self)
+    def induced_subgraph(self, vertices):  # TODO: seems that this method doesn't really create a new graph!
+        res = cp.deepcopy(self)
         for v in self.vertices:
             if v not in vertices:
-                res.del_vertex(v)
+                z1 = [c for c in res.vertices if c.label == v.label]
+                res.del_vertex(z1[0])
         return res
 
     def create_dsu(self, graphs: 'list'):
@@ -564,6 +565,7 @@ class Graph(object):
         Apply Breadth-first search to the graph
         :returns label, parent and shortest distance from source to any v in the graph
         """
+
         k = 1
         flag = {}
         pred = {}
@@ -591,6 +593,29 @@ class Graph(object):
                     Q.append(w)
 
         return label, pred, d
+
+    def sub_tree(self, root, subroot):
+        k = 1
+        flag = {}
+        d = {}
+        for v in self.vertices:
+            flag[v] = False
+            d[v] = inf
+        Q = deque()
+        flag[subroot] = True
+        d[subroot] = 0
+        Q.append(subroot)
+
+        while Q:
+            v = Q.popleft()
+            for w in v.neighbours:
+                if flag[w] == False and w is not root:
+                    flag[w] = True
+                    k += 1
+                    d[w] = d[v] + 1
+                    Q.append(w)
+        subvertices = [v for v in self.vertices if d[v] != inf]
+        return self.induced_subgraph(subvertices)
 
     @property
     def is_connected(self):
