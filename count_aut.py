@@ -1,13 +1,13 @@
+from sys import argv
+from math import factorial
+import itertools as it
 from permv2 import *
 from collections import deque, Counter
 from graph_adj import *
 from fast_col_ref import color_refinement
-from graph_io_adj import load_graph_list, write_dot
+from graph_io_adj import load_graph_list
 from graph_lib import is_unbalanced, is_bijective, cycles_from_mapping, membership_test, cardinality_generating_set
-from sys import setrecursionlimit, argv
-import itertools as it
 from is_iso import tree_isomorphism
-from math import factorial
 
 
 def count_aut_rec(A: "Graph",
@@ -86,7 +86,7 @@ def count_automorphs(graph: "Graph"):
     gen_set = list()
     color_refinement(graph)
     count_aut_rec(graph, graph, gen_set)
-    return gen_set
+    return cardinality_generating_set(gen_set)
 
 
 def tree_count_isomorphism(G: "Graph", root: "Vertex"):
@@ -162,9 +162,6 @@ if __name__ == "__main__":
         G = load_graph_list(f)[int(argv[2])]
 
     if G.is_tree():
-        center = G.find_center()
-        print("Treecount: ", tree_count_aut(G, center[0]))
+        print(tree_count_aut(G, G.find_center()[0]))
     else:
-        #sys.setrecursionlimit(10000)
-        gen_set = count_automorphs(G)
-        print(cardinality_generating_set(gen_set))
+        print(count_automorphs(G))

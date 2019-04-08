@@ -63,14 +63,10 @@ def is_isomorph(X: "Graph", Y: "Graph"):
 
     num = 0
     for u in [k for k in B.vertices if k.color == ref_c]:
-        # Save old color
         old_u_color = u.color
-        # Make the vertices the same color
         u.change_color(v.color)
-        # Recursion step
         if is_isomorph(A, B):
             return True
-        # Change color back so another vertex can get colored
         u.change_color(old_u_color)
     return False
 
