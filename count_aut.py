@@ -89,34 +89,6 @@ def count_automorphs(graph: "Graph"):
     return cardinality_generating_set(gen_set)
 
 
-def tree_count_isomorphism(G: "Graph", root: "Vertex"):
-    classes = {}
-    # determining the level-structure of the graph
-    _, _, level = G.graph_search(root)
-    # find the subroots
-    subroots = [c.i for c in G.vertices if level[c.i] == level[root.i] + 1]
-    passed = subroots
-    subtrees = [G.induced_subtree(r) for r in subroots]
-    # construct a class dict with the corresponding multiplicities
-    for sr1, sr2 in it.product(subroots, subroots):
-        if sr1 != sr2 and (sr1 in passed and sr2 in passed):
-            G1 = G.induced_subtree(root, Vertex(G, sr1))
-            G2 = G.induced_subtree(root, Vertex(G, sr2))
-            # if the subtrees are isomorphic
-            if tree_isomorphism(G1, [Vertex(G, sr1)], G2, [Vertex(G, sr2)]):
-                passed.remove(sr2)
-                if sr1 in classes:
-                    classes[sr1] += 1
-                else:
-                    classes[sr1] = 2
-    skipped = [sr for sr in passed if sr not in classes]
-    for sk in skipped:
-        classes[sk] = 1
-
-    prod = 1
-    return classes
-
-
 def tree_count_aut(G: "Graph", root: "Vertex"):
     if G.size == 1 or G.size == 2:
         return 1
