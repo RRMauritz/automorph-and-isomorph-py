@@ -117,6 +117,11 @@ def cycles_from_mapping(mapping: "List"):
 
 
 def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
+    if X.size == 1 and Y.size == 1:
+        return True
+    if X.size != Y.size:
+        return False
+
     _, _, dx = X.graph_search(centerx)
     _, _, dy = Y.graph_search(centery)
     level_vertsX = {}
@@ -137,7 +142,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
         level_vertsX[lx] = z1
         level_vertsY[ly] = z2
 
-    if max_levelX != max_levelY:  # if the trees have different depths then obviously no isomorphism
+    # if the trees have different depths then obviously no isomorphism
+    if max_levelX != max_levelY:
         return False
 
     leavesx = [
@@ -152,6 +158,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
 
     for lx, ly in zip(
             range(max_levelX - 1, -1, -1), range(max_levelY - 1, -1, -1)):
+        if len(level_vertsX[lx]) != len(level_vertsY[ly]):
+            return False
         for vx, vy in zip(level_vertsX[lx], level_vertsY[ly]):
             # iterate over the children of particular vertex vx/vy in layer lx/ly
             vx = Vertex(X, vx)
@@ -160,7 +168,7 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
                 # if vx.degree == 1 -> leave -> already a label -> skip labeling
                 labelx[vx.i] = [
                     labelx[c] for c in level_vertsX[lx + 1]
-                    if vx.is_adjacent(Vertex(Y, c))
+                    if vx.is_adjacent(Vertex(X, c))
                 ]  # list of the labels of the children
             if vy.degree > 1:
                 labely[vy.i] = [
@@ -168,20 +176,20 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
                     if vy.is_adjacent(Vertex(Y, c))
                 ]  # list of the labels of the children
 
-        canonx[lx] = [labelx[v] for v in level_vertsX[lx]
-                      ]  # canonical representation for the layer
-        canony[ly] = [labely[v] for v in level_vertsY[ly]
-                      ]  # canonical representation for the layer
+        # canonical representation for the layer
+        canonx[lx] = [labelx[v] for v in level_vertsX[lx]]
+        # canonical representation for the layer
+        canony[ly] = [labely[v] for v in level_vertsY[ly]]
         #print("Level:", lx)
         #print(" X:", canonx[lx])
         #print(" Y:", canony[ly])
         i = 0
         for x, y in zip(canonx[lx], canony[ly]):
             if isinstance(x, list):
-                x.sort(
-                )  # sort the label of a vertex if it is a list, we do this since we can't otherwise sort the canonical representation of the level (ints & lists)
-                canonx[lx][i] = int(''.join(map(str,
-                                                x)))  # convert list to int
+                # sort the label of a vertex if it is a list, we do this since we can't otherwise sort the canonical representation of the level (ints & lists)
+                x.sort()
+                # convert list to int
+                canonx[lx][i] = int(''.join(map(str, x)))
             if isinstance(y, list):
                 y.sort()
                 canony[ly][i] = int(''.join(map(str, y)))

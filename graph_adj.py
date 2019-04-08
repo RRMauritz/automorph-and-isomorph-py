@@ -187,6 +187,7 @@ class Graph:
     def graph_search(self, s: "Vertex"):
         k = 1
         flag = {v.i: False for v in self.vertices}
+        checked = {}
         pred = {v.i: -1 for v in self.vertices}
         label = {}
         d = {v.i: inf for v in self.vertices}
@@ -199,14 +200,14 @@ class Graph:
 
         while Q:
             v = Q.popleft()
-            for w in v.neighbors:
-                if flag[w.i] == False:
-                    flag[w.i] = True
-                    pred[w.i] = v.i
+            for w in self.neighbors[v.i]:
+                if flag[w] == False:
+                    flag[w] = True
+                    pred[w] = v.i
                     k += 1
-                    label[w.i] = k
-                    d[w.i] = d[v.i] + 1
-                    Q.append(w)
+                    label[w] = k
+                    d[w] = d[v.i] + 1
+                    Q.append(Vertex(self, w))
 
         return label, pred, d
 
@@ -262,8 +263,9 @@ class Graph:
         return subgraph
 
     def induced_subtree(self, root: "Vertex", parent: "Vertex"):
-        verts = set()
-        verts.add(root.i)
+        from graph_io_adj import write_dot
+        verts = list()
+        verts.append(root.i)
         s = list()
         s.append(root)
         while s:
@@ -272,7 +274,7 @@ class Graph:
                 if n == parent:
                     continue
                 if not n.i in verts:
-                    verts.add(n.i)
+                    verts.append(n.i)
                     s.append(n)
 
         subtree = self.induced_subgraph([Vertex(self, v) for v in verts])
