@@ -28,10 +28,7 @@ def count_aut_rec(A: "Graph",
             return False
         else:
             # Find the mappings induced by color refinement
-            is_mapped = set([x for sl in mapping for x in sl])
             for v in A.vertices:
-                if v.i in is_mapped:
-                    continue
                 u = next((x for x in B.vertices if x.color == v.color))
                 if (u.i, v.i) not in mapping and (v.i, u.i) not in mapping:
                     mapping.append((v.i, u.i))
