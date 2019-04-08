@@ -1,5 +1,5 @@
 from typing import List
-from copy import deepcopy
+from collections import deque
 from enum import Enum
 from math import inf
 
@@ -215,18 +215,23 @@ class Graph:
         if self.dsu:
             return False
         label, parent, dist = self.graph_search(self.vertices[0])
-        return self.size != max(label.values())
+        return self.size == max(label.values())
+
+    def is_tree(self):
+        return self.is_connected and len(self.edges) == self.size - 1
 
     def find_center(self):
         root = self.vertices[0]  # take 'random' root
         _, _, d1 = self.graph_search(root)
-        v1 = self.vertices[d1.index(max(d1))]
+        v1 = Vertex(self, max(d1, key=d1.get))
         _, parent2, d2 = self.graph_search(v1)
         # parent2 stores all the parents when we
         # go from v1 to all the other vertices
+        #print("Parent2", parent2)
 
-        v2 = d2.index(max(d2))
+        v2 = max(d2, key=d2.get)
         diam = d2[v2]  # the length of the path from v1 to v2
+        #print(diam)
         k = 0
         child = v2
         if diam % 2 == 0:
@@ -282,8 +287,7 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         G = load_graph_list(f)[int(sys.argv[2])]
 
-    color_refinement(G)
-    B = G.induced_subtree(G.vertices[4], G.vertices[5])
+    print(G.is_tree())
 
     with open("colored.dot", "w") as f:
-        write_dot(G + B, f)
+        write_dot(G, f)

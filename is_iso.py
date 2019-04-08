@@ -75,6 +75,16 @@ def is_isomorph(X: "Graph", Y: "Graph"):
     return False
 
 
+def tree_isomorphism(X: "Graph", centerx, Y: "Graph", centery):
+    if len(centerx) == 1 and len(centery) == 1:
+        return AHU(X, centerx[0], Y, centery[0])
+    elif len(centerx) == 2 and len(centery) == 2:
+        return AHU(X, centerx[0], Y, centery[0]) or AHU(
+            X, centerx[1], Y, centery[0])
+    else:
+        return False
+
+
 if __name__ == "__main__":
     if len(sys.argv) > 3:
         with open(sys.argv[1]) as f:
@@ -82,4 +92,11 @@ if __name__ == "__main__":
 
         A = graph_list[int(sys.argv[2])]
         B = graph_list[int(sys.argv[3])]
-        print(is_isomorph(A, B))
+        a_tree = A.is_tree()
+        b_tree = B.is_tree()
+        if a_tree and b_tree:
+            print(tree_isomorphism(A, A.find_center(), B, B.find_center()))
+        elif a_tree and not b_tree or not a_tree and b_tree:
+            print(False)
+        else:
+            print(is_isomorph(A, B))
