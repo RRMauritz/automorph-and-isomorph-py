@@ -1,4 +1,4 @@
-from graph import *
+from graph_adj import *
 from collections import deque
 
 
@@ -6,21 +6,16 @@ def color_refinement(G: "Graph", reset_colors=True):
     # Assign colormap: Color -> [Vertices]
     color_classes = {}
     for v in G.vertices:
-        key = v.degree
-        #key = 0
-        if not reset_colors:
+        if reset_colors:
+            key = v.degree
+        else:
             key = v.color
 
         if key in color_classes.keys():
-            color_classes[key].add(v.label)
+            color_classes[key].add(v.i)
         else:
-            color_classes[key] = set([v.label])
+            color_classes[key] = set([v.i])
 
-    # The set of neighbors for every vertice
-    neighbors = {
-        v.label: set([t.label for t in v.neighbours])
-        for v in G.vertices
-    }
 
     #TODO color_classes going from 0 to n
 
@@ -45,7 +40,7 @@ def color_refinement(G: "Graph", reset_colors=True):
             # The D_n's for this color class cc
             D = [False] * (n + 1)
             for v in verts:
-                nb = set(neighbors[v])
+                nb = set(G.neighbors[v])
                 nb = nb.intersection(split_set)
                 i = len(nb)
                 if not D[i]:
@@ -53,11 +48,13 @@ def color_refinement(G: "Graph", reset_colors=True):
                 D[i].add(v)
 
             # Clean up empty sets
-            D = [d for d in D if d]
+            #D = [d for d in D if d]
 
             # Split up cc into subpartitions from D
             first_iter = True
             for d in D:
+                if not d:
+                    continue
                 if first_iter:
                     color_classes[cc] = d
                     first_iter = False
@@ -81,8 +78,7 @@ def color_refinement(G: "Graph", reset_colors=True):
         color_stack.remove(color_class)
 
     # Map label to vertice for easy color assignment
-    verts = {v.label: v for v in G.vertices}
+    verts = {v.i: v for v in G.vertices}
     for c, vs in color_classes.items():
         for v in vs:
-            verts[v].colornum = c
-            verts[v].color = c
+            verts[v].change_color(c)

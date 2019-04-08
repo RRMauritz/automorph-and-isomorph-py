@@ -1,20 +1,35 @@
-from graph_io import *
 import time
 from isomorph import *
-from color_refinement import *
+from graph_io_adj import *
+from permv2 import *
+from fast_col_ref import color_refinement
+import sys
 
-with open('graphs/examplegraph3.grl') as f:
-    G = load_graph(f, read_list=True)
+# Use color_refinement on one graph and print the .dot file
+#
 
-G1 = G[0][2]
-G2 = G[0][0]
+# print("Automorphisms found: ", count_isomorphisms(G, G))
 
+# start = time.time()
+# for i in range(100):
+#     count_isomorphisms(G,G)
+# print("Finished for loop in: ", time.time()-start)
+# print(count_isomorphisms(G,G))
+#
 
-adjacent = [v for v in G1.vertices if v.is_adjacent(G1.find_center()[0])]
+#perm1 = permutation(6, mapping=[0, 1, 2, 3, 5, 4])
+#perm2 = permutation(6, mapping=[0, 2, 1, 3, 4, 5])
+#f = permutation(6, mapping=[0, 2, 1, 3, 5, 4])
+#gen_set = list()
+#gen_set.append(perm1)
+#gen_set.append(perm2)
+#
+#print(membership_test(gen_set, f))
 
-tree_count_automorphism(G1, G1.find_center()[0])
-
-with open('graph1.dot', 'w') as f:
-    write_dot(G1, f)
-with open('graph2.dot', 'w') as f:
-    write_dot(G2, f)
+with open(sys.argv[1]) as f:
+    G = load_graph_list(f)
+G = G[int(sys.argv[2])]
+U = G + G
+color_refinement(U)
+with open('colored.dot', 'w') as f:
+     write_dot(U, f)
