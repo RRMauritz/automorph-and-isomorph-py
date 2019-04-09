@@ -152,8 +152,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
     if len(leavesy) != len(leavesx):
         return False
     for vx, vy in zip(leavesx, leavesy):  # all leaves get label 1
-        labelx[vx] = 1
-        labely[vy] = 1
+        labelx[vx] = 0
+        labely[vy] = 0
 
     for lx, ly in zip(
             range(max_levelX - 1, -1, -1), range(max_levelY - 1, -1, -1)):
@@ -166,42 +166,46 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
             if vx.degree > 1:
                 # if vx.degree == 1 -> leave -> already a label -> skip labeling
                 # list of the labels of the children
-                labelx[vx.i] = [
-                    labelx[c] for c in level_vertsX[lx + 1]
-                    if vx.is_adjacent(Vertex(X, c))
-                ]
+                labelx[vx.i] = int("".join(
+                    map(
+                        str,
+                        sorted([
+                            labelx[c] for c in level_vertsX[lx + 1]
+                            if vx.is_adjacent(Vertex(X, c))
+                        ]))))
             if vy.degree > 1:
                 # list of the labels of the children
-                labely[vy.i] = [
-                    labely[c] for c in level_vertsY[ly + 1]
-                    if vy.is_adjacent(Vertex(Y, c))
-                ]
+                labely[vy.i] = int("".join(
+                    map(
+                        str,
+                        sorted([
+                            labely[c] for c in level_vertsY[ly + 1]
+                            if vy.is_adjacent(Vertex(Y, c))
+                        ]))))
 
         # canonical representation for the layer
         canonx[lx] = [labelx[v] for v in level_vertsX[lx]]
         # canonical representation for the layer
         canony[ly] = [labely[v] for v in level_vertsY[ly]]
-        #print("Level:", lx)
-        #print(" X:", canonx[lx])
-        #print(" Y:", canony[ly])
-        i = 0
-        for x, y in zip(canonx[lx], canony[ly]):
-            if isinstance(x, list):
-                # sort the label of a vertex if it is a list, we do this since we can't otherwise sort the canonical representation of the level (ints & lists)
-                x.sort()
-                # convert list to int
-                canonx[lx][i] = int(''.join(map(str, x)))
-            if isinstance(y, list):
-                y.sort()
-                canony[ly][i] = int(''.join(map(str, y)))
-            i += 1
 
         if sorted(canonx[lx]) == sorted(canony[ly]):
-            for v3, v4 in zip(level_vertsX[lx], level_vertsY[ly]):
-                if isinstance(labelx[v3], list):
-                    labelx[v3] = int(''.join(map(str, labelx[v3])))
-                if isinstance(labely[v4], list):
-                    labely[v4] = int(''.join(map(str, labely[v4])))
+            # Convert list
+            mapping = dict()
+
+            old_labelx = labelx.copy()
+            old_labely = labely.copy()
+            next_label = 1
+            for vx, vy in zip(level_vertsX[lx], level_vertsY[ly]):
+                if old_labelx[vx] not in mapping:
+                    mapping[old_labelx[vx]] = next_label
+                    next_label += 1
+
+                if old_labely[vy] not in mapping:
+                    mapping[old_labely[vy]] = next_label
+                    next_label += 1
+
+                labelx[vx] = mapping[old_labelx[vx]]
+                labely[vy] = mapping[old_labely[vy]]
         else:
             return False
 
