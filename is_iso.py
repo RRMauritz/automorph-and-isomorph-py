@@ -7,9 +7,6 @@ from graph_lib import *
 def is_isomorph(X: "Graph", Y: "Graph", firstcall: "bool" = True):
     # If the number of vertices or edges is different they cannot be
     # isomorphic
-    if not len(X.vertices) == len(Y.vertices) or not len(X.edges) == len(
-            Y.edges):
-        return 0
 
     # Create disjoint union
     U = X + Y
@@ -18,10 +15,6 @@ def is_isomorph(X: "Graph", Y: "Graph", firstcall: "bool" = True):
     # Split the union up again
     A, B = U.split_disjoint()
     if firstcall:
-        for v in B.vertices:
-            print("Label for v: ", v.i, " for v: ", v)
-            print("Neigh: ", B.neighbors[v.i])
-            print("Adj. matrix: ", B.adj_matrix)
         colour_twins(A, B)
 
     # Check for unbalancy and bijectivity for early recursion exit
@@ -89,10 +82,10 @@ def is_iso(A: "Graph", B: "Graph") -> bool:
         return tree_isomorphism(A, A.find_center(), B, B.find_center())
     elif a_tree and not b_tree or not a_tree and b_tree:
         return False
+    elif A.size != B.size or sum([len(n) for n in A.neighbors]) != sum(
+        [len(n) for n in B.neighbors]):
+        return False
     else:
-        if sum([len(a)
-                for a in A.neighbors]) != sum([len(b) for b in B.neighbors]):
-            return False
         return is_isomorph(A, B)
 
 

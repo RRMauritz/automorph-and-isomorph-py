@@ -48,7 +48,9 @@ class Vertex:
         nb1 = {v.i for v in self.neighbors}  # neighbours of vertex self
         nb2 = {v.i for v in other.neighbors}  # neighbours of vertex other
 
-        if self.is_adjacent(other):  # if true twins, the neighbourhoods - themselves should be equal
+        if self.is_adjacent(
+                other
+        ):  # if true twins, the neighbourhoods - themselves should be equal
             nb1.remove(other.i)
             nb2.remove(self.i)
 
@@ -141,7 +143,8 @@ class Graph:
         B.colors = self.colors[self.size:]
 
         A.neighbors = self.neighbors[:self.size]
-        B.neighbors = self.neighbors[self.size:]
+        B.neighbors = [[n - self.size for n in nb]
+                       for nb in self.neighbors[self.size:]]
 
         for i, c in enumerate(self.adj_matrix[:self.size]):
             A.adj_matrix[i] = c[:self.size]
@@ -171,8 +174,6 @@ class Graph:
                 continue
             for u in v.neighbors:
                 v_neigh = list(self.neighbors[v.i])
-                print("V Neigh: ", v_neigh)
-                print("U: ", u.i)
                 v_neigh.remove(u.i)
                 u_neigh = list(self.neighbors[u.i])
                 u_neigh.remove(v.i)
