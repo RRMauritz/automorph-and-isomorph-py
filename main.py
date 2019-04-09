@@ -54,9 +54,10 @@ def equivalence_classes(args):
 
             for o in other:
                 if o in non_iso[i]:
-                    print(
-                        "{} is isomorphic with {} which is non isomorphic with {} so skipping"
-                        .format(j, o, i))
+                    if args.verbose:
+                        print(
+                            "{} is isomorphic with {} which is non isomorphic with {} so skipping"
+                            .format(j, o, i))
                     continue
         if is_iso(a, b):
             if args.verbose:
