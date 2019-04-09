@@ -1,8 +1,6 @@
 from graph_adj import *
-from graph_io_adj import *
 from collections import Counter
 from fast_col_ref import color_refinement
-import sys
 from graph_lib import *
 
 
@@ -81,18 +79,27 @@ def tree_isomorphism(X: "Graph", centerx, Y: "Graph", centery):
         return False
 
 
+def is_iso(A: "Graph", B: "Graph") -> bool:
+    a_tree = A.is_tree()
+    b_tree = B.is_tree()
+    if a_tree and b_tree:
+        return tree_isomorphism(A, A.find_center(), B, B.find_center())
+    elif a_tree and not b_tree or not a_tree and b_tree:
+        return False
+    else:
+        if sum([len(a)
+                for a in A.neighbors]) != sum([len(b) for b in B.neighbors]):
+            return False
+        return is_isomorph(A, B)
+
+
 if __name__ == "__main__":
+    import sys
+    from graph_io_adj import *
     if len(sys.argv) > 3:
         with open(sys.argv[1]) as f:
             graph_list = load_graph_list(f)
 
         A = graph_list[int(sys.argv[2])]
         B = graph_list[int(sys.argv[3])]
-        a_tree = A.is_tree()
-        b_tree = B.is_tree()
-        if a_tree and b_tree:
-            print(tree_isomorphism(A, A.find_center(), B, B.find_center()))
-        elif a_tree and not b_tree or not a_tree and b_tree:
-            print(False)
-        else:
-            print(is_isomorph(A, B))
+        print(is_iso(A, B))

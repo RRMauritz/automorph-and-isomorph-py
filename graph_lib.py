@@ -146,9 +146,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
     if max_levelX != max_levelY:
         return False
 
-    leavesx = [
-        v.i for v in X.vertices if v.degree == 1
-    ]  # leaves: all vertices with degree one (no children themselves)
+    # leaves: all vertices with degree one (no children themselves)
+    leavesx = [v.i for v in X.vertices if v.degree == 1]
     leavesy = [v.i for v in Y.vertices if v.degree == 1]
     if len(leavesy) != len(leavesx):
         return False
@@ -166,15 +165,17 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
             vy = Vertex(Y, vy)
             if vx.degree > 1:
                 # if vx.degree == 1 -> leave -> already a label -> skip labeling
+                # list of the labels of the children
                 labelx[vx.i] = [
                     labelx[c] for c in level_vertsX[lx + 1]
                     if vx.is_adjacent(Vertex(X, c))
-                ]  # list of the labels of the children
+                ]
             if vy.degree > 1:
+                # list of the labels of the children
                 labely[vy.i] = [
                     labely[c] for c in level_vertsY[ly + 1]
                     if vy.is_adjacent(Vertex(Y, c))
-                ]  # list of the labels of the children
+                ]
 
         # canonical representation for the layer
         canonx[lx] = [labelx[v] for v in level_vertsX[lx]]
@@ -201,7 +202,6 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
                     labelx[v3] = int(''.join(map(str, labelx[v3])))
                 if isinstance(labely[v4], list):
                     labely[v4] = int(''.join(map(str, labely[v4])))
-
         else:
             return False
 

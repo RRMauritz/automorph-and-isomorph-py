@@ -5,7 +5,6 @@ from permv2 import *
 from collections import deque, Counter
 from graph_adj import *
 from fast_col_ref import color_refinement
-from graph_io_adj import load_graph_list
 from graph_lib import is_unbalanced, is_bijective, cycles_from_mapping, membership_test, cardinality_generating_set
 from is_iso import tree_isomorphism
 
@@ -125,12 +124,17 @@ def tree_count_aut(G: "Graph", root: "Vertex"):
     return prod
 
 
+def count_aut(G: "Graph") -> bool:
+    if G.is_tree():
+        return tree_count_aut(G, G.find_center()[0])
+    else:
+        return count_automorphs(G)
+
+
 if __name__ == "__main__":
     #print("Counting automorphs")
+    from graph_io_adj import load_graph_list
     with open(argv[1]) as f:
         G = load_graph_list(f)[int(argv[2])]
 
-    if G.is_tree():
-        print(tree_count_aut(G, G.find_center()[0]))
-    else:
-        print(count_automorphs(G))
+    print(count_aut(G))
