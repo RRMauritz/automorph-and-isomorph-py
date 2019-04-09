@@ -6,7 +6,7 @@ import sys
 from graph_lib import *
 
 
-def is_isomorph(X: "Graph", Y: "Graph"):
+def is_isomorph(X: "Graph", Y: "Graph", firstcall: "bool" = True):
     # If the number of vertices or edges is different they cannot be
     # isomorphic
     if not len(X.vertices) == len(Y.vertices) or not len(X.edges) == len(
@@ -17,11 +17,14 @@ def is_isomorph(X: "Graph", Y: "Graph"):
     U = X + Y
     # Apply color refinement
     color_refinement(U, reset_colors=False)
-
     # Split the union up again
     A, B = U.split_disjoint()
-
-    #twin_count = colour_twins(A, B)
+    if firstcall:
+        for v in B.vertices:
+            print("Label for v: ", v.i, " for v: ", v)
+            print("Neigh: ", B.neighbors[v.i])
+            print("Adj. matrix: ", B.adj_matrix)
+        colour_twins(A, B)
 
     # Check for unbalancy and bijectivity for early recursion exit
     if is_unbalanced(A, B):
@@ -68,7 +71,7 @@ def is_isomorph(X: "Graph", Y: "Graph"):
         # Make the vertices the same color
         u.change_color(v.color)
         # Recursion step
-        if is_isomorph(A, B):
+        if is_isomorph(A, B, False):
             return True
         # Change color back so another vertex can get colored
         u.change_color(old_u_color)
