@@ -22,9 +22,8 @@ def colour_twins(A: "Graph", B: "Graph"):
     # print("False twins b:", false_twins_b)
     for twina in twins_a:
         for twinb in twins_b:
-            if [d.color for d in twina[0].neighbors] == [
-                    d.color for d in twinb[0].neighbors
-            ]:
+            if [d.color for d in twina[0].neighbors
+                ] == [d.color for d in twinb[0].neighbors]:
                 twina[0].change_color(A.max_color + 1)
                 twinb[0].change_color(B.max_color + 1)
                 break
@@ -118,8 +117,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
 
     _, _, dx = X.graph_search(centerx)
     _, _, dy = Y.graph_search(centery)
-    level_vertsX = {}
     # dictionary with key = level, value = list of vertices corresponding to that level
+    level_vertsX = {}
     level_vertsY = {}
     labelx = {}  # canonical representation of a vertex
     labely = {}
@@ -130,8 +129,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
     max_levelY = max(dy.values())
 
     for lx, ly in zip(range(0, max_levelX + 1), range(0, max_levelY + 1)):
-        z1 = [v for v in dx.keys()
-              if dx[v] == lx]  # gather all vertices at particular level lx
+        # gather all vertices at particular level lx
+        z1 = [v for v in dx.keys() if dx[v] == lx]
         z2 = [v for v in dy.keys() if dy[v] == ly]
         level_vertsX[lx] = z1
         level_vertsY[ly] = z2
@@ -149,8 +148,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
         labelx[vx] = 0
         labely[vy] = 0
 
-    for lx, ly in zip(
-            range(max_levelX - 1, -1, -1), range(max_levelY - 1, -1, -1)):
+    for lx, ly in zip(range(max_levelX, -1, -1),
+                      range(max_levelY, -1, -1)):
         # if the cardinality of the levels differ -> no isomorphism
         if len(level_vertsX[lx]) != len(level_vertsY[ly]):
             return False

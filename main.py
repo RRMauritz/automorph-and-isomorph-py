@@ -25,9 +25,6 @@ def equivalence_classes(args):
     if args.graph:
         G = [g for i, g in enumerate(G) if i in args.graph]
 
-    pairs = list()
-    passed = set()
-
     if args.graph:
         zipper = sorted(args.graph)
     else:
@@ -35,16 +32,40 @@ def equivalence_classes(args):
 
     if args.verbose:
         print("Calculating equivalence classes for graphs", list(zipper))
+
+    pairs = list()
+    passed = set()
+    non_iso = {i: set() for i in zipper}
+
     for (i, a), (j, b) in it.combinations(zip(zipper, G), 2):
-        if i == j:
+        if i == j or i in passed or j in passed:
             continue
 
         if args.verbose:
             print("Checking for isomorphism between {} and {}".format(i, j))
+        if any(j in sl for sl in pairs):
+            pairs_with_j = [p for p in pairs if j in p]
+            other = set()
+            for p in pairs_with_j:
+                if p[0] != j:
+                    other.add(p[0])
+                else:
+                    other.add(p[1])
+
+            for o in other:
+                if o in non_iso[i]:
+                    print(
+                        "{} is isomorphic with {} which is non isomorphic with {} so skipping"
+                        .format(j, o, i))
+                    continue
         if is_iso(a, b):
             if args.verbose:
                 print("{} and {} are isomorphic".format(i, j))
             pairs.append([i, j])
+            passed.add(i)
+        else:
+            non_iso[i].add(j)
+            non_iso[j].add(i)
 
     cycles = cycles_from_mapping(pairs)
     single = set()
