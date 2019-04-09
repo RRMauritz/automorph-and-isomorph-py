@@ -2,6 +2,7 @@ from typing import List
 from collections import deque
 from enum import Enum
 from math import inf
+from collections import deque
 
 
 class Twin(Enum):
@@ -44,22 +45,22 @@ class Vertex:
         self._graph.colors[self.i] = c
 
     def twins(self, other: "Vertex"):
-        nb1 = {v.i for v in self.neighbors}
-        nb2 = {v.i for v in other.neighbors}
+        nb1 = {v.i for v in self.neighbors}  # neighbours of vertex self
+        nb2 = {v.i for v in other.neighbors}  # neighbours of vertex other
 
-        if self.is_adjacent(other):
+        if self.is_adjacent(other):  # if true twins, the neighbourhoods - themselves should be equal
             nb1.remove(other.i)
             nb2.remove(self.i)
 
             if nb1 == nb2:
-                return Twin.true
+                return Twin.true  # true twins
             else:
-                return Twin.none
+                return Twin.none  # no twins
         else:
-            if nb1 == nb2:
+            if nb1 == nb2:  # false twins
                 return Twin.false
             else:
-                return Twin.none
+                return Twin.none  # no twins
 
     def __eq__(self, other: "Vertex"):
         return self.i == other.i and self._graph == other._graph
@@ -160,22 +161,42 @@ class Graph:
     def max_color(self):
         return max(self.colors)
 
-    def twins(self):
-        checked_verts = list()
-        passed = list()
-        true_twins = list()
-        false_twins = list()
-
+    def true_twins(self):
+        """"
+        Returns all the true twins of the graph
+        """
+        true_twins = []
         for v in self.vertices:
-            passed.append(v)
-            for u in [d for d in self.vertices if d not in passed]:
-                check = v.twins(u)
-                if check == Twin.true:
-                    true_twins.append((u, v))
-                elif check == Twin.false:
-                    false_twins.append((u, v))
+            if v in [tuple[1] for tuple in true_twins]:
+                continue
+            for u in v.neighbors:
+                v_neigh = list(self.neighbors[v.i])
+                print("V Neigh: ", v_neigh)
+                print("U: ", u.i)
+                v_neigh.remove(u.i)
+                u_neigh = list(self.neighbors[u.i])
+                u_neigh.remove(v.i)
 
-        return true_twins, false_twins
+                if v_neigh == u_neigh:
+                    true_twins.append((v, u))
+        return true_twins
+
+    def false_twins(self):
+        """"
+        Returns all the false twins of the graph
+        """
+
+        false_twins = []
+        for v in self.vertices:
+            if v in [tuple[1] for tuple in false_twins]:
+                continue
+            for u in v.neighbors:
+                for w in u.neighbors:
+                    if w == v:
+                        continue
+                    if v.neighbors == w.neighbors:
+                        false_twins.append((v, w))
+        return false_twins
 
     def degree_of_color(self, b):
         for i, c in enumerate(self.colors):
@@ -221,6 +242,11 @@ class Graph:
     def is_tree(self):
         return self.is_connected and len(self.edges) == self.size - 1
 
+    def is_complete(self):
+        v = len(self.vertices)
+
+        return len(self.edges) == (v * (v - 1) / 2)
+
     def find_center(self):
         root = self.vertices[0]  # take 'random' root
         _, _, d1 = self.graph_search(root)
@@ -228,11 +254,11 @@ class Graph:
         _, parent2, d2 = self.graph_search(v1)
         # parent2 stores all the parents when we
         # go from v1 to all the other vertices
-        #print("Parent2", parent2)
+        # print("Parent2", parent2)
 
         v2 = max(d2, key=d2.get)
         diam = d2[v2]  # the length of the path from v1 to v2
-        #print(diam)
+        # print(diam)
         k = 0
         child = v2
         if diam % 2 == 0:
@@ -286,6 +312,7 @@ if __name__ == "__main__":
     from graph_io_adj import write_dot, load_graph_list
     import sys
     from fast_col_ref import color_refinement
+
     with open(sys.argv[1]) as f:
         G = load_graph_list(f)[int(sys.argv[2])]
 

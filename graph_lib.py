@@ -1,6 +1,5 @@
 from math import factorial
 from graph_adj import *
-from collections import Counter
 from basicpermutationgroup import *
 
 
@@ -15,13 +14,16 @@ def is_bijective(A, B):
 
 
 def colour_twins(A: "Graph", B: "Graph"):
-    true_twins_a, false_twins_a = A.twins()
-    true_twins_b, false_twins_b = B.twins()
-    twins_a = true_twins_a + false_twins_a
+    twins_a = A.true_twins() + A.false_twins()
+    twins_b = B.true_twins() + B.false_twins()
+    # print("True twins a:", true_twins_a)
+    # print("False twins a:", false_twins_a)
+    # print("True twins b:", true_twins_b)
+    # print("False twins b:", false_twins_b)
     for twina in twins_a:
-        for twinb in true_twins_b + false_twins_b:
+        for twinb in twins_b:
             if [d.color for d in twina[0].neighbors] == [
-                    d.color for d in twinb[0].neighbors
+                d.color for d in twinb[0].neighbors
             ]:
                 twina[0].change_color(A.max_color + 1)
                 twinb[0].change_color(B.max_color + 1)
@@ -29,14 +31,6 @@ def colour_twins(A: "Graph", B: "Graph"):
             else:
                 continue
         continue
-    res = set()
-    if A.is_connected():
-        return factorial(len(twins_a))
-    else:
-        for twin in twins_a:
-            res.add(twin[0])
-            res.add(twin[1])
-        return 2**len(res)
 
 
 def membership_test(H: "list", f: "permutation"):
@@ -146,8 +140,12 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
     if max_levelX != max_levelY:
         return False
 
+<<<<<<< HEAD
     # leaves: all vertices with degree one (no children themselves)
     leavesx = [v.i for v in X.vertices if v.degree == 1]
+=======
+    leavesx = [v.i for v in X.vertices if v.degree == 1]  # leaves: all vertices with degree 1 (no children themselves)
+>>>>>>> Rutger
     leavesy = [v.i for v in Y.vertices if v.degree == 1]
     if len(leavesy) != len(leavesx):
         return False
@@ -157,6 +155,7 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
 
     for lx, ly in zip(
             range(max_levelX - 1, -1, -1), range(max_levelY - 1, -1, -1)):
+        # if the cardinality of the levels differ -> no isomorphism
         if len(level_vertsX[lx]) != len(level_vertsY[ly]):
             return False
         for vx, vy in zip(level_vertsX[lx], level_vertsY[ly]):

@@ -23,7 +23,7 @@ def count_aut_rec(A: "Graph",
         return False
     elif is_bijective(A, B):
         if is_trivial:
-            #if root.is_trivial():
+            # if root.is_trivial():
             return False
         else:
             # Find the mappings induced by color refinement
@@ -82,7 +82,11 @@ def count_automorphs(graph: "Graph"):
     gen_set = list()
     color_refinement(graph)
     count_aut_rec(graph, graph, gen_set)
+<<<<<<< HEAD
     return cardinality_generating_set(gen_set)
+=======
+    return gen_set
+>>>>>>> Rutger
 
 
 def tree_count_aut(G: "Graph", root: "Vertex"):
@@ -118,7 +122,6 @@ def tree_count_aut(G: "Graph", root: "Vertex"):
     for stree, v in classes.items():
         if stree in passed:
             continue
-        center = stree.find_center()
         rec_tree_count = tree_count_aut(stree, stree.vertices[0])
         prod *= factorial(v) * pow(rec_tree_count, v)
     return prod
@@ -132,7 +135,6 @@ def count_aut(G: "Graph") -> bool:
 
 
 if __name__ == "__main__":
-    #print("Counting automorphs")
     from graph_io_adj import load_graph_list
     with open(argv[1]) as f:
         G = load_graph_list(f)[int(argv[2])]

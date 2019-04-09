@@ -4,7 +4,7 @@ from fast_col_ref import color_refinement
 from graph_lib import *
 
 
-def is_isomorph(X: "Graph", Y: "Graph"):
+def is_isomorph(X: "Graph", Y: "Graph", firstcall: "bool" = True):
     # If the number of vertices or edges is different they cannot be
     # isomorphic
     if not len(X.vertices) == len(Y.vertices) or not len(X.edges) == len(
@@ -15,11 +15,14 @@ def is_isomorph(X: "Graph", Y: "Graph"):
     U = X + Y
     # Apply color refinement
     color_refinement(U, reset_colors=False)
-
     # Split the union up again
     A, B = U.split_disjoint()
-
-    #twin_count = colour_twins(A, B)
+    if firstcall:
+        for v in B.vertices:
+            print("Label for v: ", v.i, " for v: ", v)
+            print("Neigh: ", B.neighbors[v.i])
+            print("Adj. matrix: ", B.adj_matrix)
+        colour_twins(A, B)
 
     # Check for unbalancy and bijectivity for early recursion exit
     if is_unbalanced(A, B):
@@ -63,7 +66,7 @@ def is_isomorph(X: "Graph", Y: "Graph"):
     for u in [k for k in B.vertices if k.color == ref_c]:
         old_u_color = u.color
         u.change_color(v.color)
-        if is_isomorph(A, B):
+        if is_isomorph(A, B, False):
             return True
         u.change_color(old_u_color)
     return False
