@@ -44,8 +44,7 @@ if __name__ == "__main__":
             zipper = args.graph
         else:
             zipper = range(len(G))
-        for (i, a), (j, b) in it.product(zip(zipper, G),
-                                         zip(zipper, G)):
+        for (i, a), (j, b) in it.product(zip(zipper, G), zip(zipper, G)):
             if i == j or i in passed or j in passed:
                 continue
 
