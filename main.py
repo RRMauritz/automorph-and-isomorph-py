@@ -16,17 +16,23 @@ def print_help():
     print("[--aut]   Count automorphisms of graphs.")
     print("{--graph} Indicate the indices of the graphs to be parsed.")
     print("          If not specified every graph is parsed.")
+    print("{-af}     Calculate automorphs first and the compare the")
+    print("          ones with equal amount for isomorphism.")
+    print("{-v}      Enable verbose mode for more logs.")
 
 
-def equivalence_classes(args):
+def equivalence_classes(args, graph_list=None):
     with open(args.path) as f:
         G = load_graph_list(f)
 
-    if args.graph:
-        G = [g for i, g in enumerate(G) if i in args.graph]
+    if graph_list == None:
+        graph_list = args.graph
 
-    if args.graph:
-        zipper = sorted(args.graph)
+    if graph_list:
+        G = [g for i, g in enumerate(G) if i in graph_list]
+
+    if graph_list:
+        zipper = sorted(graph_list)
     else:
         zipper = range(len(G))
 
@@ -52,13 +58,17 @@ def equivalence_classes(args):
                 else:
                     other.add(p[1])
 
+            not_iso = False
             for o in other:
                 if o in non_iso[i]:
                     if args.verbose:
                         print(
                             "{} is isomorphic with {} which is non isomorphic with {} so skipping"
                             .format(j, o, i))
-                    continue
+                    not_iso = True
+                    break
+            if not_iso:
+                continue
         if is_iso(a, b):
             if args.verbose:
                 print("{} and {} are isomorphic".format(i, j))
@@ -67,6 +77,8 @@ def equivalence_classes(args):
         else:
             non_iso[i].add(j)
             non_iso[j].add(i)
+            non_iso[i] = non_iso[i].union(non_iso[j])
+            non_iso[j] = non_iso[i]
 
     cycles = cycles_from_mapping(pairs)
     single = set()
@@ -125,6 +137,7 @@ if __name__ == "__main__":
                      help="Calculate number of automorphisms")
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("path")
+    parser.add_argument("-af", "--autfirst", action="store_true")
     try:
         args = parser.parse_args()
     except:
@@ -132,12 +145,24 @@ if __name__ == "__main__":
         parser.exit()
 
     if args.iso and args.aut:
-        eq_classes = equivalence_classes(args)
-        automorphs = automorphs(args, [c[0] for c in eq_classes])
-        for c in eq_classes:
-            print("{} {}".format(c,
-                                 [v for k, v in automorphs.items()
-                                  if k in c][0]))
+        # Old version, iso first then aut
+        if not args.autfirst:
+            eq_classes = equivalence_classes(args)
+            automorphs = automorphs(args, [c[0] for c in eq_classes])
+            for c in eq_classes:
+                print("{} {}".format(
+                    c, [v for k, v in automorphs.items() if k in c][0]))
+        # New version, only do iso check on graphs
+        # that have the same number of automorphs
+        else:
+            inv_autom = dict()
+            for k, v in automorphs(args).items():
+                inv_autom[v] = inv_autom.get(v, list())
+                inv_autom[v].append(k)
+            for k, v in inv_autom.items():
+                eq_classes = equivalence_classes(args, v)
+                for c in eq_classes:
+                    print("{} {}".format(c, k))
 
     elif args.aut:
         for k, v in automorphs(args).items():

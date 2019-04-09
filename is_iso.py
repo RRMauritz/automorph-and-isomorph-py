@@ -14,8 +14,8 @@ def is_isomorph(X: "Graph", Y: "Graph", firstcall: "bool" = True):
     color_refinement(U, reset_colors=False)
     # Split the union up again
     A, B = U.split_disjoint()
-    if firstcall:
-        colour_twins(A, B)
+    #if firstcall:
+    #    colour_twins(A, B)
 
     # Check for unbalancy and bijectivity for early recursion exit
     if is_unbalanced(A, B):
