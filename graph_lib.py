@@ -23,7 +23,7 @@ def colour_twins(A: "Graph", B: "Graph"):
     for twina in twins_a:
         for twinb in twins_b:
             if [d.color for d in twina[0].neighbors] == [
-                d.color for d in twinb[0].neighbors
+                    d.color for d in twinb[0].neighbors
             ]:
                 twina[0].change_color(A.max_color + 1)
                 twinb[0].change_color(B.max_color + 1)
@@ -140,12 +140,8 @@ def AHU(X: "Graph", centerx: "Vertex", Y: "Graph", centery: "Vertex"):
     if max_levelX != max_levelY:
         return False
 
-<<<<<<< HEAD
-    # leaves: all vertices with degree one (no children themselves)
+    # leaves: all vertices with degree 1 (no children themselves)
     leavesx = [v.i for v in X.vertices if v.degree == 1]
-=======
-    leavesx = [v.i for v in X.vertices if v.degree == 1]  # leaves: all vertices with degree 1 (no children themselves)
->>>>>>> Rutger
     leavesy = [v.i for v in Y.vertices if v.degree == 1]
     if len(leavesy) != len(leavesx):
         return False
