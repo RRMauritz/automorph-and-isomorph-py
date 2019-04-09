@@ -82,11 +82,7 @@ def count_automorphs(graph: "Graph"):
     gen_set = list()
     color_refinement(graph)
     count_aut_rec(graph, graph, gen_set)
-<<<<<<< HEAD
     return cardinality_generating_set(gen_set)
-=======
-    return gen_set
->>>>>>> Rutger
 
 
 def tree_count_aut(G: "Graph", root: "Vertex"):
@@ -127,7 +123,7 @@ def tree_count_aut(G: "Graph", root: "Vertex"):
     return prod
 
 
-def count_aut(G: "Graph") -> bool:
+def count_aut(G: "Graph") -> int:
     if G.is_tree():
         return tree_count_aut(G, G.find_center()[0])
     else:
