@@ -81,7 +81,6 @@ def equivalence_classes(args, graph_list=None):
         else:
             non_iso[i].add(j)
             non_iso[j].add(i)
-    print(non_iso)
 
     cycles = cycles_from_mapping(pairs)
     single = set()
@@ -147,7 +146,7 @@ if __name__ == "__main__":
         print_help()
         parser.exit()
 
-    if args.iso and args.aut:
+    if args.iso and args.aut or not args.iso and not args.aut:
         # Old version, iso first then aut
         if not args.autfirst:
             eq_classes = equivalence_classes(args)
