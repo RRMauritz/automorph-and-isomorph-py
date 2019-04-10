@@ -2,13 +2,10 @@
 
 Given a list of graphs determines the isomorphism equvialence classes and the corresponding number of automorphisms.
 
-# Authors
-[Till Pinke](https://github.com/xynxynxyn)
-
-[Jelle (Steen) Nijland](https://github.com/fearmyflames)
-
-[Rutger Mauritz](https://github.com/rrmauritz)
-
+## Authors
+[Till Pinke](https://github.com/xynxynxyn)  
+[Jelle (Steen) Nijland](https://github.com/fearmyflames)  
+[Rutger Mauritz](https://github.com/rrmauritz)  
 Huan Wu
 
 ## Usage
