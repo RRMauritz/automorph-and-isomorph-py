@@ -74,11 +74,14 @@ def equivalence_classes(args, graph_list=None):
                 print("{} and {} are isomorphic".format(i, j))
             pairs.append([i, j])
             passed.add(i)
+
+            for x in non_iso[j]:
+                non_iso[i].add(x)
+            non_iso[j] = non_iso[i]
         else:
             non_iso[i].add(j)
             non_iso[j].add(i)
-            non_iso[i] = non_iso[i].union(non_iso[j])
-            non_iso[j] = non_iso[i]
+    print(non_iso)
 
     cycles = cycles_from_mapping(pairs)
     single = set()
